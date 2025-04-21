@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react"
 import { Slot, SplashScreen } from "expo-router"
-import { KeyboardProvider } from "react-native-keyboard-controller"
-
 import { useInitialRootStore } from "@/models"
 import { useFonts } from "@expo-google-fonts/space-grotesk"
 import { customFontsToLoad } from "@/theme"
@@ -53,9 +51,7 @@ export default function Root() {
 
   return (
     <ThemeProvider value={{ themeScheme, setThemeContextOverride }}>
-      <KeyboardProvider>
-        <Slot />
-      </KeyboardProvider>
+      <Slot />
     </ThemeProvider>
   )
 }

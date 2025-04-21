@@ -14,7 +14,6 @@ import {
 } from "react-native"
 import { $styles } from "../theme"
 import { ExtendedEdge, useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
 import { useAppTheme } from "@/utils/useAppTheme"
 
 export const DEFAULT_BOTTOM_OFFSET = 50
@@ -190,7 +189,6 @@ function ScreenWithScrolling(props: ScreenProps) {
   const {
     children,
     keyboardShouldPersistTaps = "handled",
-    keyboardBottomOffset = DEFAULT_BOTTOM_OFFSET,
     contentContainerStyle,
     ScrollViewProps,
     style,
@@ -205,9 +203,9 @@ function ScreenWithScrolling(props: ScreenProps) {
   useScrollToTop(ref)
 
   return (
-    <KeyboardAwareScrollView
-      bottomOffset={keyboardBottomOffset}
-      {...{ keyboardShouldPersistTaps, scrollEnabled, ref }}
+    <ScrollView
+      keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+      {...{ scrollEnabled, ref }}
       {...ScrollViewProps}
       onLayout={(e) => {
         onLayout(e)
@@ -225,7 +223,7 @@ function ScreenWithScrolling(props: ScreenProps) {
       ]}
     >
       {children}
-    </KeyboardAwareScrollView>
+    </ScrollView>
   )
 }
 

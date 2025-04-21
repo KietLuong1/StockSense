@@ -3,17 +3,15 @@
  * free desktop app for inspecting and debugging your React Native app.
  * @see https://github.com/infinitered/reactotron
  */
-import { Platform, NativeModules } from "react-native"
+import { NativeModules, Platform } from "react-native"
 
 import { ArgType } from "reactotron-core-client"
 import { mst } from "reactotron-mst"
-import mmkvPlugin from "reactotron-react-native-mmkv"
 
-import { storage, clear } from "@/utils/storage"
+import { clear } from "@/utils/storage"
 import { router } from "expo-router"
 
 import { Reactotron } from "./ReactotronClient"
-import { ReactotronReactNative } from "reactotron-react-native"
 
 const reactotron = Reactotron.configure({
   name: require("../../package.json").name,
@@ -30,12 +28,14 @@ reactotron.use(
   }),
 )
 
-reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage }))
-
 if (Platform.OS !== "web") {
   reactotron.useReactNative({
     networking: {
       ignoreUrls: /symbolicate/,
+    },
+    // Enable AsyncStorage monitoring in Reactotron
+    asyncStorage: {
+      ignore: ["root-v1"],
     },
   })
 }
@@ -67,7 +67,7 @@ reactotron.onCustomCommand({
   command: "resetStore",
   handler: () => {
     Reactotron.log("resetting store")
-    clear()
+    void clear() // Using void to handle the Promise
   },
 })
 
@@ -77,7 +77,7 @@ reactotron.onCustomCommand<[{ name: "route"; type: ArgType.String }]>({
     const { route } = args ?? {}
     if (route) {
       Reactotron.log(`Navigating to: ${route}`)
-      router.push(route)
+      router.push(route as any)
     } else {
       Reactotron.log("Could not navigate. No route provided.")
     }

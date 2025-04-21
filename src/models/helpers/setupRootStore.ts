@@ -40,7 +40,11 @@ export async function setupRootStore(rootStore: RootStore) {
   if (_disposer) _disposer()
 
   // track changes & save to AsyncStorage
-  _disposer = onSnapshot(rootStore, (snapshot) => storage.save(ROOT_STATE_STORAGE_KEY, snapshot))
+  _disposer = onSnapshot(rootStore, (snapshot) => {
+    // We can't make this handler async directly, so we'll just call save
+    // without waiting for it to complete
+    void storage.save(ROOT_STATE_STORAGE_KEY, snapshot)
+  })
 
   const unsubscribe = () => {
     _disposer?.()
