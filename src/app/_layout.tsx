@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useEffect, useState } from "react"
 import { Slot, SplashScreen } from "expo-router"
 import { useInitialRootStore } from "@/models"
@@ -6,6 +7,7 @@ import { customFontsToLoad } from "@/theme"
 import { initI18n } from "@/i18n"
 import { loadDateFnsLocale } from "@/utils/formatDate"
 import { useThemeProvider } from "@/utils/useAppTheme"
+import { AuthProvider } from "context/AuthContext"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -50,8 +52,10 @@ export default function Root() {
   }
 
   return (
-    <ThemeProvider value={{ themeScheme, setThemeContextOverride }}>
-      <Slot />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={{ themeScheme, setThemeContextOverride }}>
+        <Slot />
+      </ThemeProvider>
+    </AuthProvider>
   )
 }
