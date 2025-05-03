@@ -6,6 +6,7 @@
     "slug": "StockSense",
     "scheme": "stocksense",
     "version": "1.0.0",
+    "sdkVersion": "53.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "icon": "./assets/images/app-icon-all.png",
@@ -14,9 +15,7 @@
     },
     "newArchEnabled": false,
     "jsEngine": "hermes",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "android": {
       "icon": "./assets/images/app-icon-android-legacy.png",
       "package": "com.stocksense",

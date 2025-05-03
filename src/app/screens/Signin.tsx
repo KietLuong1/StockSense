@@ -60,7 +60,19 @@ export default function Signin() {
           });
           
           axiosAccount.defaults.headers.Authorization = `Bearer ${accessToken}`;
-          router.replace("/screens/Dashboard");
+          requestAnimationFrame(() => {
+            try {
+              // Use push instead of replace which can be less problematic
+              router.push("/screens/Dashboard");
+            } catch (navError) {
+              console.error("Navigation error:", navError);
+              // Fallback navigation method
+              setTimeout(() => {
+                router.navigate("/screens/Dashboard");
+              }, 200);
+            }
+          });
+          
           
         } catch (authError) {
           console.error("Auth context error:", authError);
@@ -295,6 +307,7 @@ const $forgotPassword: ThemedStyle<TextStyle> = ({ colors }) => ({
 const $actions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   alignItems: "center",
   marginTop: spacing.sm,
+  marginBottom:spacing.xl
 })
 
 const $signInButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
@@ -350,9 +363,9 @@ const $socialButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
 })
 
 const $actionContainer: ThemedStyle<ViewStyle> = () => ({
-  display: 'flex',
+  flexDirection: 'row', 
   justifyContent: 'space-between',
-  alignItems: 'center'
+  alignItems: 'center',
 })
 const $rememberContainer: ThemedStyle<ViewStyle> = () => ({
   flexDirection: "row",
