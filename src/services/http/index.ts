@@ -38,12 +38,12 @@ export const getBaseUrl = () => {
       : `http://10.0.2.2:${API_PORT}${API_PATH}`;
     console.log("Using Android URL:", baseUrl);
   }
-  else if (Platform.OS === 'ios') {
-    baseUrl = Device.isDevice 
-      ? `http://${localIp}:${API_PORT}${API_PATH}` 
-      : `http://localhost:${API_PORT}${API_PATH}`;
-    console.log("Using iOS URL:", baseUrl);
-  }
+  // else if (Platform.OS === 'ios') {
+  //   baseUrl = Device.isDevice 
+  //     ? `http://${localIp}:${API_PORT}${API_PATH}` 
+  //     : `http://localhost:${API_PORT}${API_PATH}`;
+  //   console.log("Using iOS URL:", baseUrl);
+  // }
   else {
     baseUrl = `http://localhost:${API_PORT}${API_PATH}`;
     console.log("Using default URL:", baseUrl);
