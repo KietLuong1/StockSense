@@ -1,13 +1,13 @@
 /* eslint-disable prettier/prettier */
-import { useEffect, useState } from "react"
-import { Slot, SplashScreen } from "expo-router"
-import { useInitialRootStore } from "@/models"
-import { useFonts } from "@expo-google-fonts/space-grotesk"
-import { customFontsToLoad } from "@/theme"
 import { initI18n } from "@/i18n"
+import { useInitialRootStore } from "@/models"
+import { customFontsToLoad } from "@/theme"
 import { loadDateFnsLocale } from "@/utils/formatDate"
 import { useThemeProvider } from "@/utils/useAppTheme"
-import { AuthProvider } from "context/AuthContext"
+import { useFonts } from "@expo-google-fonts/space-grotesk"
+import { AuthProvider, useAuth } from "context/AuthContext"
+import { SplashScreen, Stack } from "expo-router"
+import { useEffect, useState } from "react"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -20,9 +20,36 @@ if (__DEV__) {
 
 export { ErrorBoundary } from "@/components/ErrorBoundary/ErrorBoundary"
 
+function Navigation() {
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return null;
+  }
+  
+  return (
+    <Stack 
+      screenOptions={{ 
+        headerShown: false,
+        animation: 'slide_from_right' 
+      }} 
+    >
+      {isAuthenticated ? (
+        <>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="screens" options={{ headerShown: false }} />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="screens" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+        </>
+      )}
+    </Stack>
+  );
+}
+
 export default function Root() {
-  // Wait for stores to load and render our layout inside of it so we have access
-  // to auth info etc
   const { rehydrated } = useInitialRootStore()
 
   const [fontsLoaded, fontError] = useFonts(customFontsToLoad)
@@ -52,10 +79,12 @@ export default function Root() {
   }
 
   return (
-    <AuthProvider>
+    <AuthProvider >
       <ThemeProvider value={{ themeScheme, setThemeContextOverride }}>
-        <Slot />
+        <Navigation/>
       </ThemeProvider>
     </AuthProvider>
   )
 }
+
+
