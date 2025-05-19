@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, FC, ReactNode } from "r
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { router } from "expo-router"
 import * as SecureStore from "expo-secure-store" 
+import { axiosAccount } from "@/services/http"
 
 interface AuthContextType {
   isAuthenticated: boolean
@@ -23,6 +24,13 @@ interface UserData {
   // Add other user properties as needed
 }
 
+// Define AuthState type
+interface AuthState {
+  token?: string
+  userData?: UserData
+  isAuthenticated: boolean
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
@@ -30,6 +38,9 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [userRole, setUserRole] = useState<string | undefined>()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [authState, setAuthState] = useState<AuthState | null>(null);
+
+  
 
   useEffect(() => {
     const loadAuthState = async () => {
@@ -79,7 +90,12 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       }
 
       setIsAuthenticated(true)
-      router.replace("/screens/Dashboard")
+      setAuthState({
+        token: token,
+        userData: userData,
+        isAuthenticated: true
+      });
+      router.replace("/(tabs)/Dashboard");        
     } catch (error) {
       console.error("Error during login:", error)
       throw error
@@ -88,24 +104,35 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const logout = async () => {
     try {
-      try {
-        await SecureStore.deleteItemAsync("accessToken")
-      } catch (e) {
-        await AsyncStorage.removeItem("accessToken")
+      console.log("Logging out user");
+      setIsAuthenticated(false);
+      setAuthState(null);
+      setUser(undefined);
+      setUserRole(undefined);
+    
+      if (SecureStore && typeof SecureStore.isAvailableAsync === 'function' && 
+          await SecureStore.isAvailableAsync()) {
+        await SecureStore.deleteItemAsync("accessToken");
+        await SecureStore.deleteItemAsync("refreshToken");
+      } else {
+        await AsyncStorage.removeItem("accessToken");
+        await AsyncStorage.removeItem("refreshToken");
       }
-
-      await AsyncStorage.removeItem("userData")
-
-      setUser(undefined)
-      setUserRole(undefined)
-      setIsAuthenticated(false)
-
-      router.replace("/")
+      
+      delete axiosAccount.defaults.headers.common['Authorization'];
+    
+      // try {
+      //   await axiosAccount.post('/auth/logout');
+      // } catch (serverLogoutError) {
+      //   console.log("Server logout failed, but continuing with client logout");
+      // }
+      
+      console.log("Logout successful");
+      router.replace("/screens/Signin");
     } catch (error) {
-      console.error("Error during logout:", error)
-      throw error
+      console.error("Logout error:", error);
     }
-  }
+  };
 
   return (
     <AuthContext.Provider

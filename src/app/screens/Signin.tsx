@@ -8,9 +8,9 @@ import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons"
 import { useAuth } from "context/AuthContext"
 import { router } from "expo-router"
 import { useState } from "react"
-import { Alert, Image, ImageStyle, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
-import { axiosAccount } from "@/services/http"
+import { Alert, Image, ImageStyle, Pressable, TextStyle, View, ViewStyle } from "react-native"
+
 
 const logoImage = require("../../../assets/images/login-1.png")
 
@@ -39,10 +39,8 @@ export default function Signin() {
 
   const onSubmit: SubmitHandler<FieldType> = async (data) => {
     try {
-      // console.log("Submitting login with data:", data);
-      
       const response = await loginApi(data);
-      
+    
       console.log("Response received:", response);
       
       if (!response) {
@@ -54,26 +52,10 @@ export default function Signin() {
       
       if (accessToken) {
         try {
-          await login(accessToken, {
-            userRole: response.userRole || 'user',
-            email: data.email,
-          });
-          
-          axiosAccount.defaults.headers.Authorization = `Bearer ${accessToken}`;
-          requestAnimationFrame(() => {
-            try {
-              // Use push instead of replace which can be less problematic
-              router.push("/screens/Dashboard");
-            } catch (navError) {
-              console.error("Navigation error:", navError);
-              // Fallback navigation method
-              setTimeout(() => {
-                router.navigate("/screens/Dashboard");
-              }, 200);
-            }
-          });
-          
-          
+          login(accessToken, response.refreshToken);
+          // setTimeout(() => {
+          //   router.replace("/TabsLayout");
+          // }, 100);
         } catch (authError) {
           console.error("Auth context error:", authError);
           Alert.alert("Login Error", "Failed to save authentication data");

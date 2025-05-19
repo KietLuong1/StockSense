@@ -26,15 +26,14 @@ export const loginApi = async (credentials: FieldType) => {
         console.error('Response data:', error.response.data);
         
         if (status === 403) {
-          console.error('403 FORBIDDEN - Check if:');
-          console.error('1. Your credentials are correct');
-          console.error('2. Your account has the necessary permissions');
-          console.error('3. The server has CORS properly configured');
-          
-          Alert.alert(
-            "Access Denied",
-            "The server rejected your login attempt. Please check your credentials and try again."
-          );
+          if (error.response.data?.message?.includes("expired")) {
+            console.error('Token expired');
+            Alert.alert(
+              "Session Expired",
+              "Your login session has expired. Please sign in again."
+            );
+            return null;
+          }
         } else if (status === 401) {
           Alert.alert("Authentication Error", "Invalid username or password");
         } else if (status === 400) {
