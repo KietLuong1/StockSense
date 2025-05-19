@@ -32,7 +32,7 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="Dashboard"
+        name="Dashboard/index"
         options={{
           title: "Dashboard",
           tabBarIcon: ({ color, size }) => (
@@ -41,7 +41,7 @@ export default function TabsLayout() {
         }}
       />
         <Tabs.Screen
-        name="Inventory"
+        name="Inventory/index"
         options={{
           title: "Inventory",
           tabBarIcon: ({ color, size }) => (
@@ -50,7 +50,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="Transaction"
+        name="Transaction/index"
         options={{
           title: "Transaction",
           tabBarIcon: ({ color, size }) => (
@@ -60,7 +60,7 @@ export default function TabsLayout() {
       />
       
       <Tabs.Screen
-        name="Settings"
+        name="Settings/index"
         options={{
           title: "Settings",
           tabBarIcon: ({ color, size }) => (

@@ -4,9 +4,11 @@ import { Screen, Text } from "@/components"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { FontAwesome } from "@expo/vector-icons"
 import { useState } from "react"
-import { Dimensions, ScrollView, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
+import { Dimensions, ScrollView, TouchableOpacity, View } from "react-native"
+import styles from "./styles"
 
-const screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get('window').width
+// const screenHeight = Dimensions.get('window').height;
 
 const inventoryByCategory = [
   { category: 'Electronics', count: 35, color: '#FF5733' },
@@ -65,29 +67,29 @@ export default function Dashboard() {
       console.log('renderStatCards called');
 
     return (  
-      <View style={$statCardsContainer}>
-        <View style={$statCard}>
+      <View style={styles.$statCardsContainer}>
+        <View style={styles.$statCard}>
           <FontAwesome name="cubes" size={24} color={theme.colors.palette.primary500} />
-          <Text style={$statValue}>1,240</Text>
-          <Text style={$statLabel}>Total Items</Text>
+          <Text style={styles.$statValue}>1,240</Text>
+          <Text style={styles.$statLabel}>Total Items</Text>
         </View>
         
-        <View style={$statCard}>
+        <View style={styles.$statCard}>
           <FontAwesome name="exchange" size={24} color={theme.colors.palette.accent500 } />
-          <Text style={$statValue}>126</Text>
-          <Text style={$statLabel}>Transactions</Text>
+          <Text style={styles.$statValue}>126</Text>
+          <Text style={styles.$statLabel}>Transactions</Text>
         </View>
         
-        <View style={$statCard}>
+        <View style={styles.$statCard}>
           <FontAwesome name="warning" size={24} color={theme.colors.error} />
-          <Text style={$statValue}>18</Text>
-          <Text style={$statLabel}>Low Stock</Text>
+          <Text style={styles.$statValue}>18</Text>
+          <Text style={styles.$statLabel}>Low Stock</Text>
         </View>
         
-        <View style={$statCard}>
+        <View style={styles.$statCard}>
           <FontAwesome name="clock-o" size={24} color={theme.colors.error} />
-          <Text style={$statValue}>24</Text>
-          <Text style={$statLabel}>Expiring</Text>
+          <Text style={styles.$statValue}>24</Text>
+          <Text style={styles.$statLabel}>Expiring</Text>
         </View>
       </View>
     )
@@ -95,18 +97,18 @@ export default function Dashboard() {
   
   const renderSimplePieChart = () => {
     return (
-      <View style={$chartContainer}>
-        <View style={$chartHeader}>
-          <Text style={$chartTitle}>Inventory by Category</Text>
+      <View style={styles.$chartContainer}>
+        <View style={styles.$chartHeader}>
+          <Text style={styles.$chartTitle}>Inventory by Category</Text>
         </View>
         
-        <View style={$pieChartContainer}>
-          <View style={$simplifiedChart}>
+        <View style={styles.$pieChartContainer}>
+          <View style={styles.$simplifiedChart}>
             {inventoryByCategory.map((item, index) => (
-              <View key={index} style={$legendItem}>
-                <View style={[$legendColor, { backgroundColor: item.color, width: 20, height: 20 }]} />
-                <Text style={$legendText}>{item.category} ({item.count})</Text>
-                <Text style={$legendPercent}>{Math.round((item.count / totalInventory) * 100)}%</Text>
+              <View key={index} style={styles.$legendItem}>
+                <View style={[styles.$legendColor, { backgroundColor: item.color, width: 20, height: 20 }]} />
+                <Text style={styles.$legendText}>{item.category} ({item.count})</Text>
+                <Text style={styles.$legendPercent}>{Math.round((item.count / totalInventory) * 100)}%</Text>
               </View>
             ))}
           </View>
@@ -119,23 +121,23 @@ export default function Dashboard() {
     const barWidth = (screenWidth - 100) / monthlyTransactions.length / 3;
     
     return (
-      <View style={$chartContainer}>
-        <View style={$chartHeader}>
-          <Text style={$chartTitle}>Monthly Transactions</Text>
-          <View style={$periodSelector}>
+      <View style={styles.$chartContainer}>
+        <View style={styles.$chartHeader}>
+          <Text style={styles.$chartTitle}>Monthly Transactions</Text>
+          <View style={styles.$periodSelector}>
             {['Week', 'Month', 'Year'].map(period => (
               <TouchableOpacity
                 key={period}
                 style={[
-                  $periodButton,
-                  selectedPeriod === period && $periodButtonActive
+                  styles.$periodButton,
+                  selectedPeriod === period && styles.$periodButtonActive
                 ]}
                 onPress={() => setSelectedPeriod(period)}
               >
                 <Text 
                   style={[
-                    $periodButtonText,
-                    selectedPeriod === period && $periodButtonTextActive
+                    styles.$periodButtonText,
+                    selectedPeriod === period && styles.$periodButtonTextActive
                   ]}
                 >
                   {period}
@@ -145,14 +147,14 @@ export default function Dashboard() {
           </View>
         </View>
         
-        <View style={$barChartContainer}>
-          <View style={$barChartContent}>
+        <View style={styles.$barChartContainer}>
+          <View style={styles.$barChartContent}>
             {monthlyTransactions.map((item, index) => (
-              <View key={index} style={$barGroup}>
-                <View style={$barColumn}>
+              <View key={index} style={styles.$barGroup}>
+                <View style={styles.$barColumn}>
                   <View 
                     style={[
-                      $bar, 
+                      styles.$bar, 
                       { 
                         height: 100 * (item.in / maxTransaction),
                         backgroundColor: theme.colors.palette.primary500,
@@ -162,7 +164,7 @@ export default function Dashboard() {
                   />
                   <View 
                     style={[
-                      $bar, 
+                      styles.$bar, 
                       { 
                         height: 100 * (item.out / maxTransaction),
                         backgroundColor: theme.colors.errorBackground || '#FF6B6B',
@@ -172,20 +174,20 @@ export default function Dashboard() {
                     ]} 
                   />
                 </View>
-                <Text style={$barLabel}>{item.month}</Text>
+                <Text style={styles.$barLabel}>{item.month}</Text>
               </View>
             ))}
           </View>
         </View>
         
-        <View style={$barLegendContainer}>
-          <View style={$legendItem}>
-            <View style={[$legendColor, { backgroundColor: theme.colors.palette.primary500 }]} />
-            <Text style={$legendText}>Items In</Text>
+        <View style={styles.$barLegendContainer}>
+          <View style={styles.$legendItem}>
+            <View style={[styles.$legendColor, { backgroundColor: theme.colors.palette.primary500 }]} />
+            <Text style={styles.$legendText}>Items In</Text>
           </View>
-          <View style={$legendItem}>
-            <View style={[$legendColor, { backgroundColor: theme.colors.errorBackground || '#FF6B6B' }]} />
-            <Text style={$legendText}>Items Out</Text>
+          <View style={styles.$legendItem}>
+            <View style={[styles.$legendColor, { backgroundColor: theme.colors.errorBackground || '#FF6B6B' }]} />
+            <Text style={styles.$legendText}>Items Out</Text>
           </View>
         </View>
       </View>
@@ -194,41 +196,41 @@ export default function Dashboard() {
   
   const renderAlertLists = () => {
     return (
-      <View style={$alertContainer}>
-        <View style={$alertSection}>
-          <Text style={$alertTitle}>Low Stock Items</Text>
+      <View style={styles.$alertContainer}>
+        <View style={styles.$alertSection}>
+          <Text style={styles.$alertTitle}>Low Stock Items</Text>
           {lowStockItems.map((item, index) => (
-            <View key={index} style={$alertItem}>
-              <View style={$alertIconContainer}>
+            <View key={index} style={styles.$alertItem}>
+              <View style={styles.$alertIconContainer}>
                 <FontAwesome name="exclamation-triangle" size={16} color={theme.colors.palette.neutral500} />
               </View>
-              <View style={$alertContent}>
-                <Text style={$alertItemName}>{item.name}</Text>
-                <Text style={$alertItemDetails}>
+              <View style={styles.$alertContent}>
+                <Text style={styles.$alertItemName}>{item.name}</Text>
+                <Text style={styles.$alertItemDetails}>
                   Qty: {item.quantity} (Min: {item.threshold})
                 </Text>
               </View>
-              <TouchableOpacity style={$alertAction}>
+              <TouchableOpacity style={styles.$alertAction}>
                 <FontAwesome name="plus" size={16} color={theme.colors.palette.primary500} />
               </TouchableOpacity>
             </View>
           ))}
         </View>
         
-        <View style={$alertSection}>
-          <Text style={$alertTitle}>Expiring Soon</Text>
+        <View style={styles.$alertSection}>
+          <Text style={styles.$alertTitle}>Expiring Soon</Text>
           {expiringItems.map((item, index) => (
-            <View key={index} style={$alertItem}>
-              <View style={$alertIconContainer}>
+            <View key={index} style={styles.$alertItem}>
+              <View style={styles.$alertIconContainer}>
                 <FontAwesome name="clock-o" size={16} color={theme.colors.error} />
               </View>
-              <View style={$alertContent}>
-                <Text style={$alertItemName}>{item.name}</Text>
-                <Text style={$alertItemDetails}>
+              <View style={styles.$alertContent}>
+                <Text style={styles.$alertItemName}>{item.name}</Text>
+                <Text style={styles.$alertItemDetails}>
                   Expires in {item.daysLeft} day{item.daysLeft !== 1 ? 's' : ''}
                 </Text>
               </View>
-              <TouchableOpacity style={$alertAction}>
+              <TouchableOpacity style={styles.$alertAction}>
                 <FontAwesome name="trash-o" size={16} color={theme.colors.error} />
               </TouchableOpacity>
             </View>
@@ -240,279 +242,20 @@ export default function Dashboard() {
   
   return (
       <Screen preset="fixed" safeAreaEdges={["top"]}>
-        <View style={$headerContainer}>
-          <Text preset="heading" text="Dashboard" style={$headerText} />
+        <View style={styles.$headerContainer}>
+          <Text preset="heading" text="Dashboard" style={styles.$headerText} />
         </View>
 
-        <ScrollView style={$scrollContainer} contentContainerStyle={$contentContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.$scrollContainer} contentContainerStyle={styles.$contentContainer} showsVerticalScrollIndicator={false}>
           {renderStatCards()}
           {renderSimplePieChart()}
           {renderBarChart()}
           {renderAlertLists()}
-          <View style={$footer}>
-            <Text style={$footerText}>StockSense • Last updated: Today 10:45 AM</Text>
+          <View style={styles.$footer}>
+            <Text style={styles.$footerText}>StockSense • Last updated: Today 10:45 AM</Text>
           </View>
         </ScrollView>
       </Screen>
   )
 }
 
-const $headerContainer: ViewStyle = {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  paddingHorizontal: 16,
-  paddingVertical: 12,
-  backgroundColor: 'white',
-}
-
-const $headerText: TextStyle = {
-  color: '#000',
-}
-
-const $scrollContainer: ViewStyle = {
-  backgroundColor: '#F5F5F5',
-}
-
-const $contentContainer: ViewStyle = {
-  paddingBottom: 120,
-}
-
-const $statCardsContainer: ViewStyle = {
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  justifyContent: 'space-between',
-  paddingHorizontal: 16,
-  paddingTop: 16,
-}
-
-const $statCard: ViewStyle = {
-  width: '48%',
-  backgroundColor: 'white',
-  borderRadius: 12,
-  padding: 16,
-  marginBottom: 16,
-  alignItems: 'center',
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.1,
-  shadowRadius: 4,
-  elevation: 2,
-}
-
-const $statValue: TextStyle = {
-  fontSize: 22,
-  fontWeight: 'bold',
-  color: '#000',
-  marginVertical: 8,
-}
-
-const $statLabel: TextStyle = {
-  fontSize: 16,
-  color: '#666',
-}
-
-const $chartContainer: ViewStyle = {
-  backgroundColor: 'white',
-  borderRadius: 12,
-  marginHorizontal: 16,
-  marginBottom: 20,
-  padding: 16,
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.1,
-  shadowRadius: 4,
-  elevation: 2,
-}
-
-const $chartHeader: ViewStyle = {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: 16,
-}
-
-const $chartTitle: TextStyle = {
-  fontSize: 20,
-  fontWeight: 'bold',
-  color: '#000',
-}
-
-const $pieChartContainer: ViewStyle = {
-  marginVertical: 20,
-}
-
-const $simplifiedChart: ViewStyle = {
-  padding: 10,
-}
-
-// const $legendContainer: ViewStyle = {
-//   flexDirection: 'row',
-//   flexWrap: 'wrap',
-//   justifyContent: 'center',
-//   marginTop: 8,
-// }
-
-const $legendItem: ViewStyle = {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginRight: 16,
-  marginBottom: 8,
-  padding: 4,
-}
-
-const $legendColor: ViewStyle = {
-  width: 12,
-  height: 12,
-  borderRadius: 6,
-  marginRight: 6,
-}
-
-const $legendText: TextStyle = {
-  fontSize: 14,
-  color: '#666',
-  marginRight: 8,
-}
-
-const $legendPercent: TextStyle = {
-  fontSize: 14,
-  fontWeight: 'bold',
-  color: '#333',
-}
-
-const $barChartContainer: ViewStyle = {
-  height: 200,
-  marginTop: 16,
-}
-
-const $barChartContent: ViewStyle = {
-  flex: 1,
-  height: '100%',
-  flexDirection: 'row',
-  justifyContent: 'space-around',
-  alignItems: 'flex-end',
-  paddingHorizontal: 10,
-}
-
-const $barGroup: ViewStyle = {
-  alignItems: 'center',
-}
-
-const $barColumn: ViewStyle = {
-  flexDirection: 'row',
-  height: 150,
-  alignItems: 'flex-end',
-}
-
-const $bar: ViewStyle = {
-  width: 15,
-  borderTopLeftRadius: 3,
-  borderTopRightRadius: 3,
-}
-
-const $barLabel: TextStyle = {
-  fontSize: 14,
-  color: '#666',
-  marginTop: 4,
-}
-
-const $barLegendContainer: ViewStyle = {
-  flexDirection: 'row',
-  justifyContent: 'center',
-  marginTop: 16,
-}
-
-const $periodSelector: ViewStyle = {
-  flexDirection: 'row',
-  borderRadius: 8,
-  overflow: 'hidden',
-  borderWidth: 1,
-  borderColor: '#DDD',
-}
-
-const $periodButton: ViewStyle = {
-  paddingHorizontal: 12,
-  paddingVertical: 6,
-  backgroundColor: '#F5F5F5',
-}
-
-const $periodButtonActive: ViewStyle = {
-  backgroundColor: '#007AFF',
-}
-
-const $periodButtonText: TextStyle = {
-  fontSize: 14,
-  color: '#666',
-}
-
-const $periodButtonTextActive: TextStyle = {
-  color: 'white',
-  fontWeight: 'bold',
-}
-
-const $alertContainer: ViewStyle = {
-  marginHorizontal: 16,
-  marginBottom: 20,
-}
-
-const $alertSection: ViewStyle = {
-  backgroundColor: 'white',
-  borderRadius: 12,
-  padding: 16,
-  marginBottom: 16,
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.1,
-  shadowRadius: 4,
-  elevation: 2,
-}
-
-const $alertTitle: TextStyle = {
-  fontSize: 18,
-  fontWeight: 'bold',
-  color: '#000',
-  marginBottom: 12,
-}
-
-const $alertItem: ViewStyle = {
-  flexDirection: 'row',
-  alignItems: 'center',
-  padding: 12,
-  borderBottomWidth: 1,
-  borderBottomColor: '#EEE',
-}
-
-const $alertIconContainer: ViewStyle = {
-  marginRight: 12,
-}
-
-const $alertContent: ViewStyle = {
-  flex: 1,
-}
-
-const $alertItemName: TextStyle = {
-  fontSize: 16,
-  fontWeight: '600',
-  color: '#000',
-}
-
-const $alertItemDetails: TextStyle = {
-  fontSize: 14,
-  color: '#666',
-}
-
-const $alertAction: ViewStyle = {
-  padding: 8,
-}
-
-const $footer: ViewStyle = {
-  alignItems: 'center',
-  paddingVertical: 20,
-  borderTopWidth: 1,
-  borderTopColor: '#EEE',
-}
-
-const $footerText: TextStyle = {
-  fontSize: 14,
-  color: '#666',
-}

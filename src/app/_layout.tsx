@@ -28,7 +28,7 @@ function Navigation() {
   }
   
   return (
-    <Stack 
+    <Stack initialRouteName="index" 
       screenOptions={{ 
         headerShown: false,
         animation: 'slide_from_right' 
