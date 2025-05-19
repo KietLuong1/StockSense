@@ -3,194 +3,194 @@
 import { ThemedStyle } from "@/theme"
 import { Platform, TextStyle, ViewStyle } from "react-native"
 
-export const $root: ViewStyle = {
+const $root: ViewStyle = {
   flex: 1,
 }
 
-export const $screen: ViewStyle = {
+const $screen: ViewStyle = {
   flex: 1,
 }
 
-export const $headerContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.background,
-  })
-  
-  export const $headerText: ThemedStyle<TextStyle> = ({ colors }) => ({
-    color: colors.text,
-  })
-  
-  export const $headerActions: ThemedStyle<ViewStyle> = () => ({
-    flexDirection: 'row',
-    alignItems: 'center',
-  })
-  
-  export const $filterButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-    backgroundColor: colors.palette.primary400,
-    width: 40,
-    height: 40,
-    borderRadius: spacing.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.sm,
-  })
-  
-  export const $addButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-    backgroundColor: colors.palette.primary500,
-    width: 40,
-    height: 40,
-    borderRadius: spacing.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-  })
-  
-  // Filter indicators
-  export const $filterIndicators: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.sm,
-  })
-  
-  export const $filterTag: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.palette.neutral200,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs / 2,
-    borderRadius: spacing.md,
-    marginRight: spacing.sm,
-    marginBottom: spacing.xs,
-  })
-  
-  export const $filterTagText: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
-    color: colors.text,
-    fontSize: 14,
-    marginRight: spacing.xs,
-  })
-  
-  // Filter modal styles
-  export const $modalOverlay: ThemedStyle<ViewStyle> = () => ({
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  })
-  
-  export const $filterModalContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-    backgroundColor: colors.background,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: spacing.lg,
-    maxHeight: '80%',
-  })
-  
-  export const $filterModalHeader: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  })
-  
-  export const $filterModalTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: colors.text,
-  })
-  
-  export const $filterSection: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-    marginBottom: spacing.lg,
-  })
-  
-  export const $filterSectionTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 10,
-  })
-  
-  export const $filterOptions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -spacing.xs / 2,
-  })
-  
-  export const $filterOption: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-    backgroundColor: colors.palette.neutral200,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.md,
-    margin: spacing.xs / 2,
-  })
-  
-  export const $filterOptionSelected: ThemedStyle<ViewStyle> = ({ colors }) => ({
-    backgroundColor: colors.palette.primary500,
-  })
-  
-  export const $filterOptionText: ThemedStyle<TextStyle> = ({ colors }) => ({
-    color: colors.text,
-    fontSize: 16,
-  })
-  
-  export const $filterOptionTextSelected: ThemedStyle<TextStyle> = ({ colors }) => ({
-    color: colors.palette.neutral100,
-    fontWeight: 'bold',
-  })
-  
-  export const $filterActions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: spacing.md,
-  })
-  
-  export const $resetButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-    flex: 1,
-    backgroundColor: colors.palette.neutral200,
-    paddingVertical: spacing.md,
-    borderRadius: spacing.md,
-    alignItems: 'center',
-    marginRight: spacing.sm,
-  })
-  
-  export const $resetButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
-    color: colors.text,
-    fontWeight: '600',
-    fontSize: 16,
-  })
-  
-  export const $applyButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-    flex: 1,
-    backgroundColor: colors.palette.primary500,
-    paddingVertical: spacing.md,
-    borderRadius: spacing.md,
-    alignItems: 'center',
-    marginLeft: spacing.sm,
-  })
-  
-  export const $applyButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
-    color: colors.palette.neutral100,
-    fontWeight: '600',
-    fontSize: 16,
-  })
-  
-  export const $searchContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.sm,
-  })
-  
-  export const $searchBar: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.palette.neutral300,
-    borderRadius: spacing.lg,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: Platform.OS === 'ios' ? spacing.sm : 0,
-  })
+const $headerContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingHorizontal: spacing.md,
+  paddingVertical: spacing.md,
+  backgroundColor: colors.background,
+})
 
-export const $searchInput: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+const $headerText: ThemedStyle<TextStyle> = ({ colors }) => ({
+  color: colors.text,
+})
+
+const $headerActions: ThemedStyle<ViewStyle> = () => ({
+  flexDirection: "row",
+  alignItems: "center",
+})
+
+const $filterButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.primary400,
+  width: 40,
+  height: 40,
+  borderRadius: spacing.md,
+  justifyContent: "center",
+  alignItems: "center",
+  marginRight: spacing.sm,
+})
+
+const $addButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.primary500,
+  width: 40,
+  height: 40,
+  borderRadius: spacing.md,
+  justifyContent: "center",
+  alignItems: "center",
+})
+
+// Filter indicators
+const $filterIndicators: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  flexWrap: "wrap",
+  paddingHorizontal: spacing.md,
+  marginBottom: spacing.sm,
+})
+
+const $filterTag: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: colors.palette.neutral200,
+  paddingHorizontal: spacing.sm,
+  paddingVertical: spacing.xs / 2,
+  borderRadius: spacing.md,
+  marginRight: spacing.sm,
+  marginBottom: spacing.xs,
+})
+
+const $filterTagText: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+  color: colors.text,
+  fontSize: 14,
+  marginRight: spacing.xs,
+})
+
+// Filter modal styles
+const $modalOverlay: ThemedStyle<ViewStyle> = () => ({
+  flex: 1,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  justifyContent: "flex-end",
+})
+
+const $filterModalContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  backgroundColor: colors.background,
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  padding: spacing.lg,
+  maxHeight: "80%",
+})
+
+const $filterModalHeader: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: spacing.lg,
+})
+
+const $filterModalTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
+  fontSize: 22,
+  fontWeight: "bold",
+  color: colors.text,
+})
+
+const $filterSection: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginBottom: spacing.lg,
+})
+
+const $filterSectionTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
+  fontSize: 18,
+  fontWeight: "600",
+  color: colors.text,
+  marginBottom: 10,
+})
+
+const $filterOptions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  flexWrap: "wrap",
+  marginHorizontal: -spacing.xs / 2,
+})
+
+const $filterOption: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.neutral200,
+  paddingHorizontal: spacing.md,
+  paddingVertical: spacing.sm,
+  borderRadius: spacing.md,
+  margin: spacing.xs / 2,
+})
+
+const $filterOptionSelected: ThemedStyle<ViewStyle> = ({ colors }) => ({
+  backgroundColor: colors.palette.primary500,
+})
+
+const $filterOptionText: ThemedStyle<TextStyle> = ({ colors }) => ({
+  color: colors.text,
+  fontSize: 16,
+})
+
+const $filterOptionTextSelected: ThemedStyle<TextStyle> = ({ colors }) => ({
+  color: colors.palette.neutral100,
+  fontWeight: "bold",
+})
+
+const $filterActions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginTop: spacing.md,
+})
+
+const $resetButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  flex: 1,
+  backgroundColor: colors.palette.neutral200,
+  paddingVertical: spacing.md,
+  borderRadius: spacing.md,
+  alignItems: "center",
+  marginRight: spacing.sm,
+})
+
+const $resetButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
+  color: colors.text,
+  fontWeight: "600",
+  fontSize: 16,
+})
+
+const $applyButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  flex: 1,
+  backgroundColor: colors.palette.primary500,
+  paddingVertical: spacing.md,
+  borderRadius: spacing.md,
+  alignItems: "center",
+  marginLeft: spacing.sm,
+})
+
+const $applyButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
+  color: colors.palette.neutral100,
+  fontWeight: "600",
+  fontSize: 16,
+})
+
+const $searchContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  paddingHorizontal: spacing.md,
+  marginBottom: spacing.sm,
+})
+
+const $searchBar: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: colors.palette.neutral300,
+  borderRadius: spacing.lg,
+  paddingHorizontal: spacing.sm,
+  paddingVertical: Platform.OS === "ios" ? spacing.sm : 0,
+})
+
+const $searchInput: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   flex: 1,
   fontSize: 16,
   color: colors.text,
@@ -198,12 +198,12 @@ export const $searchInput: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   paddingHorizontal: spacing.sm,
 })
 
-export const $listContent: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+const $listContent: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   padding: spacing.md,
   paddingBottom: spacing.xl * 2,
 })
 
-export const $itemContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+const $itemContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   backgroundColor: colors.palette.neutral100,
   borderRadius: spacing.md,
   marginBottom: spacing.md,
@@ -212,127 +212,127 @@ export const $itemContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => (
   shadowOpacity: 0.1,
   shadowRadius: 4,
   elevation: 2,
-  overflow: 'hidden',
+  overflow: "hidden",
 })
 
-export const $itemContent: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+const $itemContent: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   padding: spacing.md,
 })
 
-export const $itemHeader: ThemedStyle<ViewStyle> = () => ({
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
+const $itemHeader: ThemedStyle<ViewStyle> = () => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
   marginBottom: 8,
 })
 
-export const $itemName: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $itemName: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 20,
-  fontWeight: 'bold',
+  fontWeight: "bold",
   color: colors.text,
   flex: 1,
 })
 
-export const $statusBadge: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+const $statusBadge: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   paddingHorizontal: spacing.sm,
   paddingVertical: 2,
   borderRadius: spacing.sm,
 })
 
-export const $inStockBadge: ThemedStyle<ViewStyle> = () => ({
-  backgroundColor: '#90EE90',
+const $inStockBadge: ThemedStyle<ViewStyle> = () => ({
+  backgroundColor: "#90EE90",
 })
 
-export const $lowStockBadge: ThemedStyle<ViewStyle> = () => ({
-  backgroundColor: '#FFD700',
+const $lowStockBadge: ThemedStyle<ViewStyle> = () => ({
+  backgroundColor: "#FFD700",
 })
 
-export const $outOfStockBadge: ThemedStyle<ViewStyle> = ({colors}) => ({
+const $outOfStockBadge: ThemedStyle<ViewStyle> = ({ colors }) => ({
   backgroundColor: colors.error,
 })
 
-export const $expiringSoonBadge: ThemedStyle<ViewStyle> = () => ({
-  backgroundColor: '#FFD700', 
+const $expiringSoonBadge: ThemedStyle<ViewStyle> = () => ({
+  backgroundColor: "#FFD700",
 })
 
-export const $expiredBadge: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $expiredBadge: ThemedStyle<ViewStyle> = ({ colors }) => ({
   backgroundColor: colors.error,
 })
 
-export const $statusText: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $statusText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
-  fontWeight: '500',
+  fontWeight: "500",
   color: colors.text,
 })
 
-export const $itemDetails: ThemedStyle<ViewStyle> = () => ({
-  flexDirection: 'row',
-  justifyContent: 'space-between',
+const $itemDetails: ThemedStyle<ViewStyle> = () => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
   marginBottom: 8,
 })
 
-export const $itemId: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $itemId: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
   color: colors.textDim,
 })
 
-export const $itemQuantity: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $itemQuantity: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
-  fontWeight: '500',
+  fontWeight: "500",
   color: colors.text,
 })
 
-export const $itemLocation: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $itemLocation: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
   color: colors.textDim,
 })
 
-export const $itemBatch: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $itemBatch: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
   color: colors.textDim,
 })
 
-export const $itemFooter: ThemedStyle<ViewStyle> = () => ({
-  flexDirection: 'row',
-  justifyContent: 'space-between',
+const $itemFooter: ThemedStyle<ViewStyle> = () => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
 })
 
-export const $itemDate: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $itemDate: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
   color: colors.textDim,
 })
 
-export const $expiryWarning: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $expiryWarning: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.error,
-  fontWeight: '500',
+  fontWeight: "500",
 })
 
-export const $loadingContainer: ThemedStyle<ViewStyle> = () => ({
+const $loadingContainer: ThemedStyle<ViewStyle> = () => ({
   flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
+  justifyContent: "center",
+  alignItems: "center",
 })
 
-export const $loadingText: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+const $loadingText: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   color: colors.textDim,
   marginTop: spacing.sm,
 })
 
-export const $emptyContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+const $emptyContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
+  justifyContent: "center",
+  alignItems: "center",
   padding: spacing.xl,
 })
 
-export const $emptyText: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+const $emptyText: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   color: colors.textDim,
-  fontSize: 16, 
-  textAlign: 'center',
+  fontSize: 16,
+  textAlign: "center",
   marginTop: spacing.md,
 })
 
-export const $emptyButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+const $emptyButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   backgroundColor: colors.palette.primary500,
   paddingHorizontal: spacing.lg,
   paddingVertical: spacing.sm,
@@ -340,8 +340,65 @@ export const $emptyButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   marginTop: spacing.md,
 })
 
-export const $emptyButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $emptyButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.palette.neutral100,
-  fontWeight: 'bold',
+  fontWeight: "bold",
 })
 
+export default {
+  $addButton,
+  $applyButton,
+  $applyButtonText,
+  $emptyButton,
+  $emptyButtonText,
+  $emptyContainer,
+  $emptyText,
+  $expiredBadge,
+  $expiringSoonBadge,
+  $expiryWarning,
+  $filterActions,
+  $filterButton,
+  $filterIndicators,
+  $filterModalContainer,
+  $filterModalHeader,
+  $filterModalTitle,
+  $filterOption,
+  $filterOptions,
+  $filterOptionSelected,
+  $filterOptionText,
+  $filterOptionTextSelected,
+  $filterSection,
+  $filterSectionTitle,
+  $filterTag,
+  $filterTagText,
+  $headerActions,
+  $headerContainer,
+  $headerText,
+  $inStockBadge,
+  $itemBatch,
+  $itemContainer,
+  $itemContent,
+  $itemDate,
+  $itemDetails,
+  $itemFooter,
+  $itemHeader,
+  $itemId,
+  $itemLocation,
+  $itemName,
+  $itemQuantity,
+  $listContent,
+  $loadingContainer,
+  $loadingText,
+  $lowStockBadge,
+  $modalOverlay,
+  $outOfStockBadge,
+  $resetButton,
+  $resetButtonText,
+  $root,
+  $screen,
+  $searchBar,
+  $searchContainer,
+  $searchInput,
+  $statusBadge,
+  $statusText,
+}
