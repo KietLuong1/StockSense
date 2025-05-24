@@ -448,12 +448,7 @@ export default function Inventory() {
               <FontAwesome name="filter" size={18} color={theme.colors.palette.neutral100} />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={themed(styles.$addButton)}
-              onPress={() => Alert.alert("Add Item", "Add new inventory item functionality")}
-            >
-              <FontAwesome name="plus" size={18} color={theme.colors.palette.neutral100} />
-            </TouchableOpacity>
+            
           </View>
         </View>
 
