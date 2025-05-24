@@ -236,33 +236,38 @@ const $itemName: ThemedStyle<TextStyle> = ({ colors }) => ({
 const $statusBadge: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   paddingHorizontal: spacing.sm,
   paddingVertical: 2,
-  borderRadius: spacing.sm,
+  borderRadius: spacing.lg,
 })
 
-const $inStockBadge: ThemedStyle<ViewStyle> = () => ({
+const $inStockBadge: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  ...$statusBadge({ spacing } as any),
   backgroundColor: "#90EE90",
 })
 
-const $lowStockBadge: ThemedStyle<ViewStyle> = () => ({
+const $lowStockBadge: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  ...$statusBadge({ spacing } as any),
   backgroundColor: "#FFD700",
 })
 
-const $outOfStockBadge: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $outOfStockBadge: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  ...$statusBadge({ spacing } as any),
   backgroundColor: colors.error,
 })
 
-const $expiringSoonBadge: ThemedStyle<ViewStyle> = () => ({
+const $expiringSoonBadge: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  ...$statusBadge({ spacing } as any),
   backgroundColor: "#FFD700",
 })
 
-const $expiredBadge: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $expiredBadge: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  ...$statusBadge({ spacing } as any),
   backgroundColor: colors.error,
 })
 
 const $statusText: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
   fontWeight: "500",
-  color: colors.text,
+  color: 'white',
 })
 
 const $itemDetails: ThemedStyle<ViewStyle> = () => ({

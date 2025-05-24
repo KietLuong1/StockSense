@@ -51,7 +51,7 @@ const expiringItems = [
   { name: 'Bread', daysLeft: 1 },
 ];
 
-export default function Dashboard() {
+ const Dashboard = () => {
   const {theme } = useAppTheme()
   const [selectedPeriod, setSelectedPeriod] = useState('Week')
   
@@ -259,3 +259,4 @@ export default function Dashboard() {
   )
 }
 
+export default Dashboard

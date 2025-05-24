@@ -7,7 +7,6 @@ const $headerContainer: ViewStyle = {
   alignItems: "center",
   paddingHorizontal: 16,
   paddingVertical: 12,
-  backgroundColor: "white",
 }
 
 const $headerText: TextStyle = {

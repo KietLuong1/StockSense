@@ -141,7 +141,7 @@ export default function Transaction() {
     const quantity = item[TransactionKey.QUANTITY]
     const batchId = item[TransactionKey.BATCH_ID]
     const expiredDate = item[TransactionKey.EXPIRED_DATE]
-
+    
     return (
       <TouchableOpacity
         style={themed(styles.$itemContainer)}
@@ -152,7 +152,6 @@ export default function Transaction() {
           )
         }
       >
-        {" "}
         <View style={themed(styles.$itemContent)}>
           <View style={themed(styles.$itemHeader)}>
             <Text style={themed(styles.$itemName)}>{productName}</Text>
@@ -371,12 +370,12 @@ export default function Transaction() {
               <FontAwesome name="filter" size={18} color={theme.colors.palette.neutral100} />
             </TouchableOpacity>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={themed(styles.$addButton)}
               onPress={() => Alert.alert("New Transaction", "Add new transaction functionality")}
             >
               <FontAwesome name="plus" size={18} color={theme.colors.palette.neutral100} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
 
