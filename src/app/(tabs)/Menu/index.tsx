@@ -38,7 +38,7 @@ export default function Menu() {
       <View style={themed(styles.$container)}>
         <TouchableOpacity
           style={themed(styles.$settingItem)}
-          onPress={() => router.push("/Product")}
+          onPress={() => router.push("/Menu/Product")}
         >
           <View style={themed(styles.$settingRow)}>
             <FontAwesome name="product-hunt" size={20} color={useAppTheme().theme.colors.text} />
@@ -46,14 +46,16 @@ export default function Menu() {
           </View>
           <FontAwesome name="chevron-right" size={16} color={useAppTheme().theme.colors.textDim} />
         </TouchableOpacity>
-        <TouchableOpacity style={themed(styles.$settingItem)}>
+
+        <TouchableOpacity style={themed(styles.$settingItem)} onPress={() => router.push("/Menu/Suppliers")}>
           <View style={themed(styles.$settingRow)}>
             <FontAwesome name="user" size={20} color={useAppTheme().theme.colors.text} />
             <Text text="Suppliers" style={themed(styles.$settingText)} />
           </View>
           <FontAwesome name="chevron-right" size={16} color={useAppTheme().theme.colors.textDim} />
         </TouchableOpacity>
-        <TouchableOpacity style={themed(styles.$settingItem)}>
+
+        <TouchableOpacity style={themed(styles.$settingItem)} onPress={() => router.push("/Menu/Location")}>
           <View style={themed(styles.$settingRow)}>
             <FontAwesome name="location-arrow" size={20} color={useAppTheme().theme.colors.text} />
             <Text text="Location" style={themed(styles.$settingText)} />

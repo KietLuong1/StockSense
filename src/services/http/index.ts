@@ -9,6 +9,8 @@ import Constants from 'expo-constants'
 import { API_BASE_URL } from "@/queries/Transaction/api"
 import { API_INVENTORY_URL } from "@/queries/Inventory/api"
 import { API_PRODUCT_URL } from "@/queries/Products/api"
+import { API_SUPPLIER_URL } from "@/queries/Supplier/api"
+import { API_LOCATION_URL } from "@/queries/Location/api"
 
 const API_PORT = "8080"
 const API_PATH = "/api/v1"
@@ -227,6 +229,20 @@ export const inventoryAPI = axios.create({
 
 export const productAPI = axios.create({
   baseURL: API_PRODUCT_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
+export const supplierAPI = axios.create({
+  baseURL: API_SUPPLIER_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
+export const locationAPI = axios.create({
+  baseURL: API_LOCATION_URL,
   headers: {
     'Content-Type': 'application/json'
   }

@@ -46,21 +46,12 @@ export default function TabsLayout() {
         tabBarHideOnKeyboard: true,
       }}
     >
-      {/* <Tabs.Screen
-        name="Dashboard"
-        options={{
-          title: "Dashboard",
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="home" size={size} color={color} />
-          ),
-        }}
-      /> */}
         <Tabs.Screen
         name="Inventory"
         options={{
           title: "Inventory",
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="list-ul" size={size} color={color} />
+            <FontAwesome name="industry" size={size} color={color} />
           ),
         }}
       />
@@ -73,7 +64,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-      
       <Tabs.Screen
         name="Menu"
         options={{
