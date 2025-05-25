@@ -6,6 +6,9 @@ import { Platform } from "react-native"
 import * as SecureStore from "expo-secure-store"
 import * as Device from 'expo-device'
 import Constants from 'expo-constants'
+import { API_BASE_URL } from "@/queries/Transaction/api"
+import { API_INVENTORY_URL } from "@/queries/Inventory/api"
+import { API_PRODUCT_URL } from "@/queries/Products/api"
 
 const API_PORT = "8080"
 const API_PATH = "/api/v1"
@@ -37,12 +40,7 @@ export const getBaseUrl = () => {
       : `http://10.0.2.2:${API_PORT}${API_PATH}`;
     console.log("Using Android URL:", baseUrl);
   }
-  // else if (Platform.OS === 'ios') {
-  //   baseUrl = Device.isDevice 
-  //     ? `http://${localIp}:${API_PORT}${API_PATH}` 
-  //     : `http://localhost:${API_PORT}${API_PATH}`;
-  //   console.log("Using iOS URL:", baseUrl);
-  // }
+
   else {
     baseUrl = `http://localhost:${API_PORT}${API_PATH}`;
     console.log("Using default URL:", baseUrl);
@@ -171,7 +169,6 @@ axiosAccount.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
   
-    // More general condition for auth-related errors (401 or 403)
     if ((error.response?.status === 403 || error.response?.status === 401) && 
         !originalRequest._retry) {
       
@@ -179,18 +176,14 @@ axiosAccount.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // Get new token
         const newToken = await refreshToken();
         
         if (newToken) {
           console.log("Token refresh successful, retrying request");
-          // Update the request with new token
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          // Retry the original request with new token
           return axiosAccount(originalRequest);
         } else {
           console.log("Token refresh failed, user needs to re-authenticate");
-          // Clear tokens and redirect to login
           await AsyncStorage.removeItem("accessToken");
           await AsyncStorage.removeItem("refreshToken");
           
@@ -205,7 +198,6 @@ axiosAccount.interceptors.response.use(
       }
     }
     
-    // Add better error logging
     if (error.response) {
       console.error(`Server responded with status ${error.response.status}`);
       console.error("Response data:", JSON.stringify(error.response.data, null, 2));
@@ -219,28 +211,23 @@ axiosAccount.interceptors.response.use(
   }
 );
 
-// export const testApiConnection = async () => {
-//   try {
-//     const url = `${getBaseUrl()}/health`;
-//     console.log("Testing API connectivity to:", url);
-    
-//     const response = await axios.get(url, {
-//       timeout: 5000,
-//       headers: {
-//         "Content-Type": "application/json",
-//         "Accept": "application/json",
-//       },
-//     });
-    
-//     console.log("Connection successful:", response.status, response.statusText);
-//     return true;
-//   } catch (error: any) {
-//     console.error("Connection test failed:", error.message);
-//     if (axios.isAxiosError(error) && error.response) {
-//       console.error("Status:", error.response.status);
-//       console.error("Status Text:", error.response.statusText);
-//       console.error("Data:", error.response.data);
-//     }
-//     return false;
-//   }
-// }
+export const transactionAPI = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+export const inventoryAPI = axios.create({
+  baseURL: API_INVENTORY_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
+export const productAPI = axios.create({
+  baseURL: API_PRODUCT_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})

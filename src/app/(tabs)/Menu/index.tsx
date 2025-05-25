@@ -5,11 +5,13 @@ import { useAppTheme } from "@/utils/useAppTheme"
 import { FontAwesome } from "@expo/vector-icons"
 import { useAuth } from "context/AuthContext"
 import { Alert, TouchableOpacity, View } from "react-native"
+import { useRouter } from "expo-router"
 import styles from "./styles"
 
-export default function Settings() {
+export default function Menu() {
   const { logout } = useAuth()
   const { themed } = useAppTheme()
+  const router = useRouter()
 
   const handleLogout = () => {
     Alert.alert("Confirm Logout", "Are you sure you want to log out?", [
@@ -31,36 +33,38 @@ export default function Settings() {
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]}>
       <View style={themed(styles.$headerContainer)}>
-        <Text preset="heading" text="Settings" style={themed(styles.$headerText)} />
+        <Text preset="heading" text="Menu" style={themed(styles.$headerText)} />
       </View>
       <View style={themed(styles.$container)}>
-        
+        <TouchableOpacity
+          style={themed(styles.$settingItem)}
+          onPress={() => router.push("/Product")}
+        >
+          <View style={themed(styles.$settingRow)}>
+            <FontAwesome name="product-hunt" size={20} color={useAppTheme().theme.colors.text} />
+            <Text text="Products" style={themed(styles.$settingText)} />
+          </View>
+          <FontAwesome name="chevron-right" size={16} color={useAppTheme().theme.colors.textDim} />
+        </TouchableOpacity>
         <TouchableOpacity style={themed(styles.$settingItem)}>
           <View style={themed(styles.$settingRow)}>
             <FontAwesome name="user" size={20} color={useAppTheme().theme.colors.text} />
-            <Text text="Profile" style={themed(styles.$settingText)} />
+            <Text text="Suppliers" style={themed(styles.$settingText)} />
           </View>
           <FontAwesome name="chevron-right" size={16} color={useAppTheme().theme.colors.textDim} />
         </TouchableOpacity>
-        
         <TouchableOpacity style={themed(styles.$settingItem)}>
           <View style={themed(styles.$settingRow)}>
-            <FontAwesome name="bell" size={20} color={useAppTheme().theme.colors.text} />
-            <Text text="Notifications" style={themed(styles.$settingText)} />
+            <FontAwesome name="location-arrow" size={20} color={useAppTheme().theme.colors.text} />
+            <Text text="Location" style={themed(styles.$settingText)} />
           </View>
           <FontAwesome name="chevron-right" size={16} color={useAppTheme().theme.colors.textDim} />
         </TouchableOpacity>
-        
-        <TouchableOpacity style={themed(styles.$settingItem)}>
-          <View style={themed(styles.$settingRow)}>
-            <FontAwesome name="lock" size={20} color={useAppTheme().theme.colors.text} />
-            <Text text="Security" style={themed(styles.$settingText)} />
-          </View>
-          <FontAwesome name="chevron-right" size={16} color={useAppTheme().theme.colors.textDim} />
-        </TouchableOpacity>
-        
-        <Text preset="subheading" text="More" style={[themed(styles.$contentHeader), {marginTop: 20}]} />
-        
+        <Text
+          preset="subheading"
+          text="More"
+          style={[themed(styles.$contentHeader), { marginTop: 20 }]}
+        />
         <TouchableOpacity style={themed(styles.$settingItem)}>
           <View style={themed(styles.$settingRow)}>
             <FontAwesome name="question-circle" size={20} color={useAppTheme().theme.colors.text} />
@@ -68,7 +72,6 @@ export default function Settings() {
           </View>
           <FontAwesome name="chevron-right" size={16} color={useAppTheme().theme.colors.textDim} />
         </TouchableOpacity>
-        
         <TouchableOpacity style={themed(styles.$settingItem)}>
           <View style={themed(styles.$settingRow)}>
             <FontAwesome name="info-circle" size={20} color={useAppTheme().theme.colors.text} />
@@ -76,18 +79,13 @@ export default function Settings() {
           </View>
           <FontAwesome name="chevron-right" size={16} color={useAppTheme().theme.colors.textDim} />
         </TouchableOpacity>
-        
         <TouchableOpacity
           style={themed(styles.$logoutTouchable)}
           onPress={handleLogout}
           activeOpacity={0.7}
         >
           <View style={themed(styles.$logoutRow)}>
-            <FontAwesome
-              name="sign-out"
-              size={24}
-              color={useAppTheme().theme.colors.error}
-            />
+            <FontAwesome name="sign-out" size={24} color={useAppTheme().theme.colors.error} />
             <Text preset="bold" text="Logout" style={themed(styles.$logoutTextStyle)} />
           </View>
         </TouchableOpacity>

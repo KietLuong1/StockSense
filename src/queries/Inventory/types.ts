@@ -3,6 +3,7 @@ import { InventoryKey } from './keys'
 
 export type InventoryTypes = {
   [InventoryKey.PRODUCT_ID]: string
+  [InventoryKey.PRODUCT_NAME]: string
   [InventoryKey.LOCATION_ID]: string
   [InventoryKey.QUANTITY]: number
   [InventoryKey.BATCH_NUMBER]: string
@@ -13,6 +14,7 @@ export type InventoryTypes = {
 export interface InventoryPayload {
   inventory_id?: string
   product_id: string
+  product_name?: string
   location_id: string
   quantity: number
   batch_number: string
@@ -23,6 +25,7 @@ export interface InventoryPayload {
 export interface InventoryResponse {
   inventory_id: string
   product_id: string
+  product_name: string
   location_id: string
   quantity: number
   batch_number: string

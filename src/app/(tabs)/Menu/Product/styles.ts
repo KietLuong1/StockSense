@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ThemedStyle } from "@/theme"
 import { Platform, TextStyle, ViewStyle } from "react-native"
 
@@ -232,6 +233,12 @@ const $itemName: ThemedStyle<TextStyle> = ({ colors }) => ({
   flex: 1,
 })
 
+const $itemPrice: ThemedStyle<TextStyle> = ({ colors }) => ({
+  fontSize: 18,
+  fontWeight: "bold",
+  color: colors.palette.primary500,
+})
+
 const $itemDetails: ThemedStyle<ViewStyle> = () => ({
   flexDirection: "row",
   justifyContent: "space-between",
@@ -243,25 +250,29 @@ const $itemId: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.textDim,
 })
 
-const $itemQuantity: ThemedStyle<TextStyle> = ({ colors }) => ({
+const $categoryBadge: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
+  backgroundColor: colors.palette.secondary200,
+  paddingHorizontal: spacing.sm,
+  paddingVertical: 2,
+  borderRadius: spacing.md,
+})
+
+const $categoryText: ThemedStyle<TextStyle> = ({ colors }) => ({
+  fontSize: 14,
+  color: colors.text,
+  fontWeight: "500",
+})
+
+const $statusBadge: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  paddingHorizontal: spacing.sm,
+  paddingVertical: 2,
+  borderRadius: spacing.md,
+  marginLeft: spacing.xs,
+})
+
+const $statusText: ThemedStyle<TextStyle> = () => ({
   fontSize: 14,
   fontWeight: "500",
-  color: colors.text,
-})
-
-const $itemLocation: ThemedStyle<TextStyle> = ({ colors }) => ({
-  fontSize: 14,
-  color: colors.textDim,
-})
-
-const $itemBatch: ThemedStyle<TextStyle> = ({ colors }) => ({
-  fontSize: 14,
-  color: colors.textDim,
-})
-
-const $itemDate: ThemedStyle<TextStyle> = ({ colors }) => ({
-  fontSize: 14,
-  color: colors.error,
 })
 
 const $loadingContainer: ThemedStyle<ViewStyle> = () => ({
@@ -306,6 +317,8 @@ export default {
   $addButton,
   $applyButton,
   $applyButtonText,
+  $categoryBadge,
+  $categoryText,
   $emptyButton,
   $emptyButtonText,
   $emptyContainer,
@@ -328,19 +341,15 @@ export default {
   $headerActions,
   $headerContainer,
   $headerText,
-  $itemBatch,
   $itemContainer,
   $itemContent,
-  $itemDate,
   $itemDetails,
   $itemHeader,
   $itemId,
-  $itemLocation,
   $itemName,
-  $itemQuantity,
+  $itemPrice,
   $listContent,
-  $loadingContainer,
-  $loadingText,
+  $loadingContainer,  $loadingText,
   $modalOverlay,
   $resetButton,
   $resetButtonText,
@@ -349,4 +358,6 @@ export default {
   $searchBar,
   $searchContainer,
   $searchInput,
+  $statusBadge,
+  $statusText,
 }

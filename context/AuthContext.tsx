@@ -95,7 +95,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         userData: userData,
         isAuthenticated: true
       });
-      router.replace("/(tabs)/Dashboard");        
+      router.replace("/(tabs)/Inventory");        
     } catch (error) {
       console.error("Error during login:", error)
       throw error

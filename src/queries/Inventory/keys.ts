@@ -2,6 +2,7 @@
 export enum InventoryKey {
     INVENTORY_ID = 'inventory_id',
     PRODUCT_ID = 'product_id',
+    PRODUCT_NAME = 'product_name',
     LOCATION_ID = 'location_id',
     QUANTITY = 'quantity',
     BATCH_NUMBER = 'batch_number',

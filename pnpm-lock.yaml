@@ -26,6 +26,9 @@ importers:
       '@shopify/flash-list':
         specifier: 1.7.6
         version: 1.7.6(@babel/runtime@7.27.0)(react-native@0.79.2(@babel/core@7.26.10)(@types/react@18.3.20)(react@19.0.0))(react@19.0.0)
+      '@tanstack/react-query':
+        specifier: ^5.77.0
+        version: 5.77.0(react@19.0.0)
       apisauce:
         specifier: 3.0.1
         version: 3.0.1
@@ -1614,6 +1617,14 @@ packages:
 
   '@sinonjs/fake-timers@10.3.0':
     resolution: {integrity: sha512-V4BG07kuYSUkTCSBHG8G8TNhM+F19jXFWnQtzj+we8DrkpSBCee9Z3Ms8yiGer/dlmhe35/Xdgyo3/0rQKg7YA==}
+
+  '@tanstack/query-core@5.77.0':
+    resolution: {integrity: sha512-PFeWjgMQjOsnxBwnW/TJoO0pCja2dzuMQoZ3Diho7dPz7FnTUwTrjNmdf08evrhSE5nvPIKeqV6R0fvQfmhGeg==}
+
+  '@tanstack/react-query@5.77.0':
+    resolution: {integrity: sha512-jX52ot8WxWzWnAknpRSEWj6PTR/7nkULOfoiaVPk6nKu0otwt30UMBC9PTg/m1x0uhz1g71/imwjViTm/oYHxA==}
+    peerDependencies:
+      react: ^18 || ^19
 
   '@testing-library/react-native@12.9.0':
     resolution: {integrity: sha512-wIn/lB1FjV2N4Q7i9PWVRck3Ehwq5pkhAef5X5/bmQ78J/NoOsGbVY2/DG5Y9Lxw+RfE+GvSEh/fe5Tz6sKSvw==}
@@ -7616,6 +7627,13 @@ snapshots:
   '@sinonjs/fake-timers@10.3.0':
     dependencies:
       '@sinonjs/commons': 3.0.1
+
+  '@tanstack/query-core@5.77.0': {}
+
+  '@tanstack/react-query@5.77.0(react@19.0.0)':
+    dependencies:
+      '@tanstack/query-core': 5.77.0
+      react: 19.0.0
 
   '@testing-library/react-native@12.9.0(jest@29.7.0(@types/node@22.14.1)(ts-node@10.9.2(@types/node@22.14.1)(typescript@5.3.3)))(react-native@0.79.2(@babel/core@7.26.10)(@types/react@18.3.20)(react@19.0.0))(react-test-renderer@18.2.0(react@19.0.0))(react@19.0.0)':
     dependencies:
