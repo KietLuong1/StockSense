@@ -5,9 +5,13 @@ import { customFontsToLoad } from "@/theme"
 import { loadDateFnsLocale } from "@/utils/formatDate"
 import { useThemeProvider } from "@/utils/useAppTheme"
 import { useFonts } from "@expo-google-fonts/space-grotesk"
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from "context/AuthContext"
 import { SplashScreen, Stack } from "expo-router"
 import { useEffect, useState } from "react"
+
+// Create a client
+const queryClient = new QueryClient()
 
 SplashScreen.preventAutoHideAsync()
 
@@ -77,12 +81,13 @@ export default function Root() {
   if (!loaded) {
     return null
   }
-
   return (
     <AuthProvider >
-      <ThemeProvider value={{ themeScheme, setThemeContextOverride }}>
-        <Navigation/>
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider value={{ themeScheme, setThemeContextOverride }}>
+          <Navigation/>
+        </ThemeProvider>
+      </QueryClientProvider>
     </AuthProvider>
   )
 }

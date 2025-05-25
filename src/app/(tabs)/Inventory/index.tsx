@@ -1,8 +1,9 @@
 /* eslint-disable prettier/prettier */
 
 import { Screen, Text } from "@/components"
-import { locationNames, productNames, sampleInventoryData } from "@/queries/Inventory/mockData"
+import { locationNames, productNames } from "@/queries/Inventory/mockData"
 import { InventoryResponse } from "@/queries/Inventory/types"
+import { useGetListInventory } from "@/queries/Inventory/useGetListInventory"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { FontAwesome } from "@expo/vector-icons"
 import { useEffect, useState } from "react"
@@ -61,46 +62,20 @@ export default function Inventory() {
     setTempSortBy("product_id")
     setTempSortOrder("asc")
   }
-
-  const getDaysUntilExpiry = (expiryDate: string): number => {
-    const today = new Date()
-    const expiry = new Date(expiryDate)
-    const diffTime = expiry.getTime() - today.getTime()
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  }
-
-  const getInventoryStatus = (
-    item: InventoryResponse,
-  ): {
-    status: "In Stock" | "Low Stock" | "Out of Stock" | "Expiring Soon" | "Expired"
-    daysUntilExpiry?: number
-  } => {
-    const daysUntilExpiry = getDaysUntilExpiry(item.expiry_date)
-
-    if (daysUntilExpiry < 0) {
-      return { status: "Expired", daysUntilExpiry }
-    }
-
-    if (item.quantity <= 0) {
-      return { status: "Out of Stock" }
-    }
-
-    if (daysUntilExpiry < 30) {
-      return { status: "Expiring Soon", daysUntilExpiry }
-    }
-
-    if (item.quantity < 10) {
-      return { status: "Low Stock" }
-    }
-
-    return { status: "In Stock" }
-  }
-
+  // Status functionality removed
+  const { data: inventoryData, error: inventoryError } = useGetListInventory()
+  
   useEffect(() => {
     const fetchInventory = async () => {
+      setIsLoading(true)
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        setInventory(sampleInventoryData)
+        if (inventoryError) {
+          throw inventoryError
+        }
+        
+        if (inventoryData) {
+          setInventory(inventoryData)
+        }
       } catch (error) {
         console.error("Error fetching inventory:", error)
         Alert.alert("Error", "Failed to load inventory data")
@@ -110,7 +85,7 @@ export default function Inventory() {
     }
 
     fetchInventory()
-  }, [])
+  }, [inventoryData, inventoryError])
 
   useEffect(() => {
     let filtered = [...inventory]
@@ -171,7 +146,9 @@ export default function Inventory() {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      setInventory(sampleInventoryData)
+      if (inventoryData) {
+        setInventory(inventoryData)
+      }
     } catch (error) {
       console.error("Error refreshing inventory:", error)
       Alert.alert("Error", "Failed to refresh inventory data")
@@ -179,30 +156,13 @@ export default function Inventory() {
       setRefreshing(false)
     }
   }
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString()
   }
 
-  const getStatusBadgeStyle = (status: string) => {
-    switch (status) {
-      case "In Stock":
-        return themed(styles.$inStockBadge)
-      case "Low Stock":
-        return themed(styles.$lowStockBadge)
-      case "Expiring Soon":
-        return themed(styles.$expiringSoonBadge)
-      case "Expired":
-        return themed(styles.$expiredBadge)
-      default:
-        return themed(styles.$outOfStockBadge)
-    }
-  }
-
   const renderItem = ({ item }: { item: InventoryResponse }) => {
-    const { status, daysUntilExpiry } = getInventoryStatus(item)
-    const productName = productNames[item.product_id] || item.product_id
+    const productName = productNames[item.product_name] || item.product_name
     const locationName = locationNames[item.location_id] || item.location_id
 
     return (
@@ -218,14 +178,6 @@ export default function Inventory() {
         <View style={themed(styles.$itemContent)}>
           <View style={themed(styles.$itemHeader)}>
             <Text style={themed(styles.$itemName)}>{productName}</Text>
-            <View style={getStatusBadgeStyle(status)}>
-              <Text style={themed(styles.$statusText)}>
-                {status}
-                {status === "Expiring Soon" && daysUntilExpiry !== undefined
-                  ? ` (${daysUntilExpiry} days)`
-                  : ""}
-              </Text>
-            </View>
           </View>
 
           <View style={themed(styles.$itemDetails)}>
@@ -235,21 +187,14 @@ export default function Inventory() {
 
           <View style={themed(styles.$itemDetails)}>
             <Text style={themed(styles.$itemLocation)} numberOfLines={1} ellipsizeMode="tail">
-              {locationName}
+          Location: {locationName}
             </Text>
             <Text style={themed(styles.$itemBatch)}>Batch: {item.batch_number}</Text>
           </View>
 
           <View style={themed(styles.$itemFooter)}>
             <Text style={themed(styles.$itemDate)}>Import: {formatDate(item.import_date)}</Text>
-            <Text
-              style={[
-                themed(styles.$itemDate),
-                daysUntilExpiry !== undefined && daysUntilExpiry < 30
-                  ? themed(styles.$expiryWarning)
-                  : null,
-              ]}
-            >
+            <Text style={themed(styles.$itemDate)}>
               Expiry: {formatDate(item.expiry_date)}
             </Text>
           </View>

@@ -233,42 +233,14 @@ const $itemName: ThemedStyle<TextStyle> = ({ colors }) => ({
   flex: 1,
 })
 
-const $statusBadge: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  paddingHorizontal: spacing.sm,
-  paddingVertical: 2,
-  borderRadius: spacing.lg,
-})
-
-const $inStockBadge: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  ...$statusBadge({ spacing } as any),
-  backgroundColor: "#90EE90",
-})
-
-const $lowStockBadge: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  ...$statusBadge({ spacing } as any),
-  backgroundColor: "#FFD700",
-})
-
-const $outOfStockBadge: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  ...$statusBadge({ spacing } as any),
-  backgroundColor: colors.error,
-})
-
-const $expiringSoonBadge: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  ...$statusBadge({ spacing } as any),
-  backgroundColor: "#FFD700",
-})
-
-const $expiredBadge: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  ...$statusBadge({ spacing } as any),
-  backgroundColor: colors.error,
-})
-
-const $statusText: ThemedStyle<TextStyle> = ({ colors }) => ({
-  fontSize: 14,
-  fontWeight: "500",
-  color: 'white',
-})
+// Status badge styles removed
+const $statusBadge = null
+const $inStockBadge = null
+const $lowStockBadge = null 
+const $outOfStockBadge = null
+const $expiringSoonBadge = null
+const $expiredBadge = null
+const $statusText = null
 
 const $itemDetails: ThemedStyle<ViewStyle> = () => ({
   flexDirection: "row",
@@ -304,7 +276,7 @@ const $itemFooter: ThemedStyle<ViewStyle> = () => ({
 
 const $itemDate: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
-  color: colors.textDim,
+  color: colors.error,
 })
 
 const $expiryWarning: ThemedStyle<TextStyle> = ({ colors }) => ({
@@ -358,8 +330,7 @@ export default {
   $emptyButtonText,
   $emptyContainer,
   $emptyText,
-  $expiredBadge,
-  $expiringSoonBadge,
+  // Status styles removed
   $expiryWarning,
   $filterActions,
   $filterButton,
@@ -379,7 +350,7 @@ export default {
   $headerActions,
   $headerContainer,
   $headerText,
-  $inStockBadge,
+  // Status styles removed
   $itemBatch,
   $itemContainer,
   $itemContent,
@@ -394,9 +365,9 @@ export default {
   $listContent,
   $loadingContainer,
   $loadingText,
-  $lowStockBadge,
+  // Status styles removed
   $modalOverlay,
-  $outOfStockBadge,
+  // Status styles removed
   $resetButton,
   $resetButtonText,
   $root,
@@ -404,6 +375,5 @@ export default {
   $searchBar,
   $searchContainer,
   $searchInput,
-  $statusBadge,
-  $statusText,
+  // Status styles removed
 }
