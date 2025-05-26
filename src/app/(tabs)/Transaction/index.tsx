@@ -448,7 +448,7 @@ export default function Transaction() {
               </View>
             )}
           </View>
-        )}{" "}
+        )}
         {isFetching && isLoading ? (
           <View style={themed(styles.$loadingContainer)}>
             <ActivityIndicator size="large" color={theme.colors.palette.primary500} />

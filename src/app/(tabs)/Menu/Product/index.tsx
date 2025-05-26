@@ -128,9 +128,9 @@ export default function Product() {
 
     setFilteredProducts(filtered)
   }, [products, searchQuery, selectedCategory, sortOrder, sortBy])
-
   const onRefresh = async () => {
     setRefreshing(true)
+    setIsLoading(true)
 
     try {
       if (productsData) {
@@ -140,7 +140,10 @@ export default function Product() {
       console.error("Error refreshing products:", error)
       Alert.alert("Error", "Failed to refresh product data")
     } finally {
-      setRefreshing(false)
+      setTimeout(() => {
+        setRefreshing(false)
+        setIsLoading(false)
+      }, 800) // Add a slight delay for better UX
     }
   }
 
@@ -184,7 +187,6 @@ export default function Product() {
       </TouchableOpacity>
     )
   }
-
   const renderEmptyList = () => {
     if (isLoading) return null
 
@@ -196,9 +198,9 @@ export default function Product() {
             ? "No matching products found"
             : "No products available"}
         </Text>
-        <TouchableOpacity style={themed(styles.$emptyButton)} onPress={onRefresh}>
-          <Text style={themed(styles.$emptyButtonText)}>Refresh</Text>
-        </TouchableOpacity>
+        <Text style={themed(styles.$emptyText)}>
+          Pull down to refresh the list
+        </Text>
       </View>
     )
   }
@@ -431,12 +433,12 @@ export default function Product() {
               </View>
             )}
           </View>
-        )}
-
-        {isLoading ? (
+        )}        {isLoading ? (
           <View style={themed(styles.$loadingContainer)}>
             <ActivityIndicator size="large" color={theme.colors.palette.primary500} />
-            <Text style={themed(styles.$loadingText)}>Loading products...</Text>
+            <Text style={themed(styles.$loadingText)}>
+              {refreshing ? "Refreshing products..." : "Loading products..."}
+            </Text>
           </View>
         ) : (
           <FlatList
