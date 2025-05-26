@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+// eslint-disable-next-line import/namespace
 import { ChangePasswordFieldType } from '@/app/screens/ForgotPassword';
 import { FieldType } from '@/app/screens/Signin';
 import { axiosAccount } from '@/services/http';
@@ -62,14 +63,48 @@ export const loginApi = async (credentials: FieldType) => {
 export const verifyEmail = async (email: string): Promise<string | null> => {
   try {
     console.log('Making verify email request for:', email);
-    const response = await axiosAccount.post(`/forgotPassword/verifyMail/${email}`)
-    return response.data
+    const response = await axios.post(`${axiosAccount.defaults.baseURL}/forgotPassword/verifyMail/${email}`, {}, {
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      timeout: 10000, // 10 second timeout
+    });
+    console.log('Email verification response:', response.status);
+    return response.data;
   } catch (error) {
-    console.error('Failed to verify email', error)
+    console.error('Failed to verify email', error);
     if (axios.isAxiosError(error)) {
-      console.error('Axios error details:', error.response?.data || error.message)
+      console.error('Axios error details:', error.response?.data || error.message);
+      
+      if (error.response) {
+        // Server responded with an error
+        if (error.response.status === 403) {
+          Alert.alert(
+            "Access Denied",
+            "The server denied access to this endpoint. Please contact support."
+          );
+        } else if (error.response.status === 404) {
+          Alert.alert("Email Not Found", "This email is not registered in our system.");
+        } else {
+          Alert.alert("Error", "Failed to send OTP. Please try again later.");
+        }
+      } else if (error.request) {
+        // Request was made but no response was received (network error)
+        console.error('Network error - no response received');
+        Alert.alert(
+          "Network Error",
+          "Unable to connect to the server. Please check your internet connection and try again."
+        );
+      } else {
+        // Something happened in setting up the request
+        Alert.alert("Error", "Failed to send OTP. Please try again later.");
+      }
+    } else {
+      // Non-axios error
+      Alert.alert("Error", "An unexpected error occurred. Please try again.");
     }
-    return null
+    return null;
   }
 }
 
@@ -77,14 +112,48 @@ export const verifyEmail = async (email: string): Promise<string | null> => {
 export const verifyOtp = async (otp: number, email: string): Promise<string | null> => {
   try {
     console.log('Making verify OTP request:', otp, email);
-    const response = await axiosAccount.post(`/forgotPassword/verifyOtp/${otp}/${email}`)
-    return response.data
+    const response = await axios.post(`${axiosAccount.defaults.baseURL}/forgotPassword/verifyOtp/${otp}/${email}`, {}, {
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      timeout: 10000, // 10 second timeout
+    });
+    console.log('OTP verification response:', response.status);
+    return response.data;
   } catch (error) {
-    console.error('Failed to verify OTP', error)
+    console.error('Failed to verify OTP', error);
     if (axios.isAxiosError(error)) {
-      console.error('Axios error details:', error.response?.data || error.message)
+      console.error('Axios error details:', error.response?.data || error.message);
+      
+      if (error.response) {
+        // Server responded with an error
+        if (error.response.status === 403) {
+          Alert.alert(
+            "Access Denied",
+            "The server denied access to this endpoint. Please contact support."
+          );
+        } else if (error.response.status === 400) {
+          Alert.alert("Invalid OTP", "The OTP you entered is invalid or has expired.");
+        } else {
+          Alert.alert("Error", "Failed to verify OTP. Please try again later.");
+        }
+      } else if (error.request) {
+        // Request was made but no response was received (network error)
+        console.error('Network error - no response received');
+        Alert.alert(
+          "Network Error",
+          "Unable to connect to the server. Please check your internet connection and try again."
+        );
+      } else {
+        // Something happened in setting up the request
+        Alert.alert("Error", "Failed to verify OTP. Please try again later.");
+      }
+    } else {
+      // Non-axios error
+      Alert.alert("Error", "An unexpected error occurred. Please try again.");
     }
-    return null
+    return null;
   }
 }
 
@@ -92,16 +161,51 @@ export const verifyOtp = async (otp: number, email: string): Promise<string | nu
 export const changePassword = async (passwordDetails: ChangePasswordFieldType): Promise<string | null> => {
   try {
     console.log('Making change password request for:', passwordDetails.email);
-    const response = await axiosAccount.post(
-      `/forgotPassword/changePassword/${passwordDetails.email}`,
-      passwordDetails
-    )
-    return response.data
+    const response = await axios.post(
+      `${axiosAccount.defaults.baseURL}/forgotPassword/changePassword/${passwordDetails.email}`,
+      passwordDetails,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        timeout: 10000, // 10 second timeout
+      }
+    );
+    console.log('Change password response:', response.status);
+    return response.data;
   } catch (error) {
-    console.error('Failed to change password', error)
+    console.error('Failed to change password', error);
     if (axios.isAxiosError(error)) {
-      console.error('Axios error details:', error.response?.data || error.message)
+      console.error('Axios error details:', error.response?.data || error.message);
+      
+      if (error.response) {
+        // Server responded with an error
+        if (error.response.status === 403) {
+          Alert.alert(
+            "Access Denied",
+            "The server denied access to this endpoint. Please contact support."
+          );
+        } else if (error.response.status === 400) {
+          Alert.alert("Invalid Request", "Please check your password requirements.");
+        } else {
+          Alert.alert("Error", "Failed to change password. Please try again later.");
+        }
+      } else if (error.request) {
+        // Request was made but no response was received (network error)
+        console.error('Network error - no response received');
+        Alert.alert(
+          "Network Error",
+          "Unable to connect to the server. Please check your internet connection and try again."
+        );
+      } else {
+        // Something happened in setting up the request
+        Alert.alert("Error", "Failed to change password. Please try again later.");
+      }
+    } else {
+      // Non-axios error
+      Alert.alert("Error", "An unexpected error occurred. Please try again.");
     }
-    return null
+    return null;
   }
 }
