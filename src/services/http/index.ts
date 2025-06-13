@@ -7,7 +7,7 @@ import axios, { AxiosInstance } from "axios"
 // import Config from "../../config/config.dev"
 
 const API_LOGINSERVICE_PORT = "8080"
-const API_WAREHOUSE_PORT = "8081"
+const API_WAREHOUSE_PORT = "8082"
 const API_PATH = "/api/v1"
 const FALLBACK_IP = "192.168.100.144"
 
