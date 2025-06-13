@@ -1,28 +1,22 @@
-/* eslint-disable prettier/prettier */
 import { SupplierKey } from "./key"
 
 export type SupplierTypes = {
+  [SupplierKey.ID]: string
   [SupplierKey.NAME]: string
-  [SupplierKey.PHONE]: number
-  [SupplierKey.EMAIL]: string
   [SupplierKey.ADDRESS]: string
-  [SupplierKey.CREATE_AT]: string
+  [SupplierKey.CONTACT_INFO]: string
 }
 
 export interface SupplierPayload {
-  supplierId?: string
+  id?: string
   name: string
-  phone: number
-  email: string
   address: string
-  create_at: string
+  contactInfo: string
 }
 
 export interface SupplierResponse {
-  supplierId: string
+  id: string
   name: string
-  phone: number
-  email: string
   address: string
-  create_at: string
+  contactInfo: string
 }

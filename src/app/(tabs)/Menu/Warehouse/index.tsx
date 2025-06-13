@@ -1,7 +1,7 @@
 import { Screen, Text } from "@/components"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { FontAwesome } from "@expo/vector-icons"
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState } from "react"
 import {
   ActivityIndicator,
   Alert,
@@ -16,124 +16,119 @@ import {
   View,
 } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { WarehouseResponse } from "@/queries/Warehouse/types"
+import { useGetListWarehouse } from "@/queries/Warehouse/useGetListWarehouse"
 import styles from "./styles"
-import { TransactionResponse } from "@/queries/Transaction/types"
-import { TransactionKey } from "@/queries/Transaction/key"
-import { useGetListTransactions } from "@/queries/Transaction/useGetListTransaction"
+import { WarehouseKey } from "@/queries/Warehouse/key"
 
-export default function Transaction() {
+export default function Warehouse() {
   const { themed, theme } = useAppTheme()
   const insets = useSafeAreaInsets()
 
-  const [transactions, setTransactions] = useState<TransactionResponse[]>([])
-  const [filteredTransactions, setFilteredTransactions] = useState<TransactionResponse[]>([])
+  const [warehouses, setWarehouses] = useState<WarehouseResponse[]>([])
+  const [filteredWarehouses, setFilteredWarehouses] = useState<WarehouseResponse[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
-  const [selectedTransactionType, setSelectedTransactionType] = useState("All")
-  const [transactionTypes, setTransactionTypes] = useState<string[]>(["All"])
+  const [selectedActive, setSelectedActive] = useState("All")
+  const [active, setActive] = useState<string[]>(["All"])
 
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const [sortBy, setSortBy] = useState<TransactionKey>(TransactionKey.ID)
+  const [sortBy, setSortBy] = useState<WarehouseKey>(WarehouseKey.ID)
   const [filterModalVisible, setFilterModalVisible] = useState(false)
 
-  const [tempTransactionType, setTempTransactionType] = useState("All")
-  const [tempSortBy, setTempSortBy] = useState<TransactionKey>(TransactionKey.ID)
+  const [tempActive, setTempActive] = useState("All")
+  const [tempSortBy, setTempSortBy] = useState<WarehouseKey>(WarehouseKey.ID)
   const [tempSortOrder, setTempSortOrder] = useState<"asc" | "desc">("asc")
 
-  const { data: transactionsData, error: transactionsError } = useGetListTransactions()
+  const { data: warehousesData, error: warehousesError } = useGetListWarehouse()
 
   const openFilterModal = () => {
-    setTempTransactionType(selectedTransactionType)
+    setTempActive(selectedActive)
     setTempSortBy(sortBy)
     setTempSortOrder(sortOrder)
     setFilterModalVisible(true)
   }
 
   const applyFilters = () => {
-    setSelectedTransactionType(tempTransactionType)
+    setSelectedActive(tempActive)
     setSortBy(tempSortBy)
     setSortOrder(tempSortOrder)
     setFilterModalVisible(false)
   }
 
   const resetFilters = () => {
-    setTempTransactionType("All")
-    setTempSortBy(TransactionKey.ID)
+    setTempActive("All")
+    setTempSortBy(WarehouseKey.ID)
     setTempSortOrder("asc")
   }
 
   useEffect(() => {
-    if (transactionsData) {
-      setTransactions(transactionsData)
-      setIsLoading(false)
-    }
-  }, [transactionsData])
-
-  useEffect(() => {
-    const fetchTransactions = async () => {
+    const fetchWarehouses = async () => {
       setIsLoading(true)
       try {
-        if (transactionsError) {
-          throw transactionsError
+        if (warehousesError) {
+          throw warehousesError
         }
-        if (transactionsData) {
-          setTransactions(transactionsData)
-          // Extract unique transaction types
-          const uniqueTransactionTypes = Array.from(
-            new Set(transactionsData.map((item) => item.transactionType)),
+
+        if (warehousesData) {
+          setWarehouses(warehousesData)
+
+          // Extract unique active statuses
+          const uniqueActiveStatuses = Array.from(
+            new Set(
+              warehousesData.map((item) => (Number(item.active) === 1 ? "Active" : "Inactive")),
+            ),
           )
-          setTransactionTypes(["All", ...uniqueTransactionTypes])
+          setActive(["All", ...uniqueActiveStatuses])
         }
       } catch (error) {
-        console.error("Error fetching transactions:", error)
-        Alert.alert("Error", "Failed to load transactions data")
+        console.error("Error fetching warehouses:", error)
+        Alert.alert("Error", "Failed to load warehouse data")
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchTransactions()
-  }, [transactionsData, transactionsError])
+    fetchWarehouses()
+  }, [warehousesData, warehousesError])
 
   useEffect(() => {
-    let filtered = [...transactions]
+    let filtered = [...warehouses]
 
-    if (selectedTransactionType !== "All") {
-      filtered = filtered.filter((item) => item.transactionType === selectedTransactionType)
+    if (selectedActive !== "All") {
+      filtered = filtered.filter(
+        (item) => (Number(item.active) === 1 ? "Active" : "Inactive") === selectedActive,
+      )
     }
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter((item) => {
-        const transactionType = item.transactionType.toLowerCase()
-        const status = item.status.toLowerCase()
-        const transactionId = (item.id ?? "").toLowerCase()
-        return (
-          transactionType.includes(query) || status.includes(query) || transactionId.includes(query)
-        )
+        const location = item.location.toLowerCase()
+        const name = item.name.toLowerCase()
+
+        return location.includes(query) || name.includes(query)
       })
     }
 
-    const keyMap: Record<string, keyof TransactionResponse> = {
-      id: "id",
-      product: "product",
-      transaction_type: "transactionType",
-      status: "status",
-      total_products: "totalProducts",
-      total_price: "totalPrice",
-      created_at: "createdAt",
-      update_at: "updateAt",
-      description: "description",
+    const keyMap: Record<WarehouseKey, keyof WarehouseResponse> = {
+      [WarehouseKey.ID]: "id",
+      [WarehouseKey.NAME]: "name",
+      [WarehouseKey.LOCATION]: "location",
+      [WarehouseKey.CAPACITY]: "capacity",
+      [WarehouseKey.ACTIVE]: "active",
+      [WarehouseKey.CREATED_AT]: "createdAt",
+      [WarehouseKey.UPDATED_AT]: "updatedAt",
     }
 
     filtered.sort((a, b) => {
-      const mappedKey = keyMap[sortBy] ?? sortBy
+      const mappedKey = keyMap[sortBy]
       let valueA: any = a[mappedKey]
       let valueB: any = b[mappedKey]
 
-      if (mappedKey === "createdAt" || mappedKey === "updateAt") {
+      if (mappedKey === "createdAt" || mappedKey === "updatedAt") {
         valueA = new Date(valueA).getTime()
         valueB = new Date(valueB).getTime()
       }
@@ -146,19 +141,20 @@ export default function Transaction() {
       return sortOrder === "asc" ? Number(valueA) - Number(valueB) : Number(valueB) - Number(valueA)
     })
 
-    setFilteredTransactions(filtered)
-  }, [transactions, searchQuery, selectedTransactionType, sortOrder, sortBy])
+    setFilteredWarehouses(filtered)
+  }, [warehouses, searchQuery, selectedActive, sortOrder, sortBy])
 
   const onRefresh = async () => {
     setRefreshing(true)
     setIsLoading(true)
+
     try {
-      if (transactionsData) {
-        setTransactions(transactionsData)
+      if (warehousesData) {
+        setWarehouses(warehousesData)
       }
     } catch (error) {
-      console.error("Error refreshing transactions:", error)
-      Alert.alert("Error", "Failed to refresh transactions data")
+      console.error("Error refreshing warehouses:", error)
+      Alert.alert("Error", "Failed to refresh warehouse data")
     } finally {
       setTimeout(() => {
         setRefreshing(false)
@@ -167,51 +163,64 @@ export default function Transaction() {
     }
   }
 
-  const formatPrice = (price: number) => {
-    return `${price.toLocaleString("vi-VN")} VND`
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "1":
+        return theme.colors.palette.angry500
+      case "0":
+        return theme.colors.palette.neutral900
+      default:
+        return theme.colors.palette.primary500
+    }
   }
 
-  const formatDate = (dateString: string): string => {
+  const formatCapacity = (capacity: number) => {
+    return `${capacity.toLocaleString("vi-VN")} m²`
+  }
+
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString()
   }
 
-  const renderItem = ({ item }: { item: TransactionResponse }) => {
+  const renderItem = ({ item }: { item: WarehouseResponse }) => {
     return (
       <TouchableOpacity
         style={themed(styles.$itemContainer)}
         onPress={() =>
           Alert.alert(
-            item.product.name,
-            `Total Products: ${formatPrice(item.totalProducts)}
-            \nPrice: ${formatPrice(item.totalPrice)}
-            \nTransaction Type: ${item.transactionType}
-            \nStatus: ${item.status}
+            item.name,
+            `Location: ${item.location}
+            \nCapacity: ${formatCapacity(item.capacity)}
+            \nActive: ${item.active ? "Active" : "Inactive"}
             \nCreated At: ${formatDate(item.createdAt ?? "")}
-            \nUpdated At: ${formatDate(item.updateAt ?? "")}
-            \nTransaction Description: ${item.description}
-            \nProduct Description: ${item.product.description}`,
+            \nUpdated Date: ${formatDate(item.updatedAt ?? "")}`,
           )
         }
       >
         <View style={themed(styles.$itemContent)}>
           <View style={themed(styles.$itemHeader)}>
-            <Text style={themed(styles.$itemName)}>{item.product.name}</Text>
+            <Text style={themed(styles.$itemCode)}>{item.name}</Text>
+            <View
+              style={[
+                themed(styles.$statusBadge),
+                { backgroundColor: getStatusColor(item.active ? "1" : "0") },
+              ]}
+            >
+              <Text style={themed(styles.$statusText)}>{item.active ? "Active" : "Inactive"}</Text>
+            </View>
           </View>
 
           <View style={themed(styles.$itemDetails)}>
-            <Text style={themed(styles.$itemId)}>Type: {item.transactionType}</Text>
-            <Text style={themed(styles.$itemBatch)}>Status: {item.status}</Text>
-          </View>
-
-          <View style={themed(styles.$itemDetails)}>
-            <Text style={themed(styles.$itemLocation)}>Products: {item.totalProducts}</Text>
-            <Text style={themed(styles.$itemLocation)}>Prices: {formatPrice(item.totalPrice)}</Text>
+            <Text style={themed(styles.$itemLocation)}>Location: {item.location}</Text>
+            <Text style={themed(styles.$itemCapacity)}>
+              Capacity: {formatCapacity(item.capacity)}
+            </Text>
           </View>
 
           <View style={themed(styles.$itemFooter)}>
             <Text style={themed(styles.$itemDate)}>Created: {formatDate(item.createdAt)}</Text>
-            <Text style={themed(styles.$itemDate)}>Updated: {formatDate(item.updateAt)}</Text>
+            <Text style={themed(styles.$itemDate)}>Updated: {formatDate(item.updatedAt)}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -223,11 +232,9 @@ export default function Transaction() {
 
     return (
       <View style={themed(styles.$emptyContainer)}>
-        <FontAwesome name="exchange" size={50} color={theme.colors.palette.neutral400} />
+        <FontAwesome name="map-marker" size={50} color={theme.colors.palette.neutral400} />
         <Text style={themed(styles.$emptyText)}>
-          {searchQuery || selectedTransactionType !== "All"
-            ? "No matching transactions found"
-            : "No transactions available"}
+          {searchQuery ? "No matching locations found" : "No locations available"}
         </Text>
         <TouchableOpacity style={themed(styles.$emptyButton)} onPress={onRefresh}>
           <Text style={themed(styles.$emptyButtonText)}>Refresh</Text>
@@ -256,22 +263,21 @@ export default function Transaction() {
                 </View>
 
                 <View style={themed(styles.$filterSection)}>
-                  <Text style={themed(styles.$filterSectionTitle)}>Transaction Type</Text>
+                  <Text style={themed(styles.$filterSectionTitle)}>Type</Text>
                   <View style={themed(styles.$filterOptions)}>
-                    {transactionTypes.map((type) => (
+                    {active.map((type) => (
                       <TouchableOpacity
                         key={type}
                         style={[
                           themed(styles.$filterOption),
-                          tempTransactionType === type && themed(styles.$filterOptionSelected),
+                          tempActive === type && themed(styles.$filterOptionSelected),
                         ]}
-                        onPress={() => setTempTransactionType(type)}
+                        onPress={() => setTempActive(type)}
                       >
                         <Text
                           style={[
                             themed(styles.$filterOptionText),
-                            tempTransactionType === type &&
-                              themed(styles.$filterOptionTextSelected),
+                            tempActive === type && themed(styles.$filterOptionTextSelected),
                           ]}
                         >
                           {type}
@@ -287,15 +293,15 @@ export default function Transaction() {
                     <TouchableOpacity
                       style={[
                         themed(styles.$filterOption),
-                        tempSortBy === TransactionKey.CREATED_AT &&
+                        tempSortBy === WarehouseKey.CREATED_AT &&
                           themed(styles.$filterOptionSelected),
                       ]}
-                      onPress={() => setTempSortBy(TransactionKey.CREATED_AT)}
+                      onPress={() => setTempSortBy(WarehouseKey.CREATED_AT)}
                     >
                       <Text
                         style={[
                           themed(styles.$filterOptionText),
-                          tempSortBy === TransactionKey.CREATED_AT &&
+                          tempSortBy === WarehouseKey.CREATED_AT &&
                             themed(styles.$filterOptionTextSelected),
                         ]}
                       >
@@ -306,15 +312,15 @@ export default function Transaction() {
                     <TouchableOpacity
                       style={[
                         themed(styles.$filterOption),
-                        tempSortBy === TransactionKey.UPDATED_AT &&
+                        tempSortBy === WarehouseKey.UPDATED_AT &&
                           themed(styles.$filterOptionSelected),
                       ]}
-                      onPress={() => setTempSortBy(TransactionKey.UPDATED_AT)}
+                      onPress={() => setTempSortBy(WarehouseKey.UPDATED_AT)}
                     >
                       <Text
                         style={[
                           themed(styles.$filterOptionText),
-                          tempSortBy === TransactionKey.UPDATED_AT &&
+                          tempSortBy === WarehouseKey.UPDATED_AT &&
                             themed(styles.$filterOptionTextSelected),
                         ]}
                       >
@@ -389,7 +395,7 @@ export default function Transaction() {
       <Screen preset="fixed" safeAreaEdges={["top"]} style={styles.$screen}>
         <View style={themed(styles.$headerContainer)}>
           <Text preset="heading" style={themed(styles.$headerText)}>
-            Transactions
+            Warehouse
           </Text>
 
           <View style={themed(styles.$headerActions)}>
@@ -404,7 +410,7 @@ export default function Transaction() {
             <FontAwesome name="search" size={16} color={theme.colors.palette.neutral500} />
             <TextInput
               style={themed(styles.$searchInput)}
-              placeholder="Search type, status..."
+              placeholder="Search locations..."
               placeholderTextColor={theme.colors.palette.neutral500}
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -420,15 +426,15 @@ export default function Transaction() {
             )}
           </View>
         </View>
-        {(selectedTransactionType !== "All" ||
-          sortBy !== TransactionKey.UPDATED_AT ||
+        {(selectedActive !== "All" ||
+          sortBy !== WarehouseKey.UPDATED_AT ||
           sortOrder !== "asc") && (
           <View style={themed(styles.$filterIndicators)}>
-            {selectedTransactionType !== "All" && (
+            {selectedActive !== "All" && (
               <View style={themed(styles.$filterTag)}>
-                <Text style={themed(styles.$filterTagText)}>Type: {selectedTransactionType}</Text>
+                <Text style={themed(styles.$filterTagText)}>Type: {selectedActive}</Text>
                 <TouchableOpacity
-                  onPress={() => setSelectedTransactionType("All")}
+                  onPress={() => setSelectedActive("All")}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   <FontAwesome name="times" size={12} color={theme.colors.text} />
@@ -436,22 +442,22 @@ export default function Transaction() {
               </View>
             )}
 
-            {(sortBy !== TransactionKey.ID || sortOrder !== "asc") && (
+            {(sortBy !== WarehouseKey.ID || sortOrder !== "asc") && (
               <View style={themed(styles.$filterTag)}>
                 <Text style={themed(styles.$filterTagText)}>
                   Sort:
-                  {sortBy === TransactionKey.ID
-                    ? "Transaction ID"
-                    : sortBy === TransactionKey.CREATED_AT
+                  {sortBy === WarehouseKey.ID
+                    ? "Warehouse ID"
+                    : sortBy === WarehouseKey.CREATED_AT
                       ? "Created At"
-                      : sortBy === TransactionKey.UPDATED_AT
+                      : sortBy === WarehouseKey.UPDATED_AT
                         ? "Updated At"
                         : ""}
                   ({sortOrder === "asc" ? "↑" : "↓"})
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    setSortBy(TransactionKey.ID)
+                    setSortBy(WarehouseKey.ID)
                     setSortOrder("asc")
                   }}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -466,12 +472,12 @@ export default function Transaction() {
           <View style={themed(styles.$loadingContainer)}>
             <ActivityIndicator size="large" color={theme.colors.palette.primary500} />
             <Text style={themed(styles.$loadingText)}>
-              {refreshing ? "Refreshing transactions..." : "Loading transactions..."}
+              {refreshing ? "Refreshing warehouses..." : "Loading warehouses..."}
             </Text>
           </View>
         ) : (
           <FlatList
-            data={filteredTransactions}
+            data={filteredWarehouses}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             contentContainerStyle={themed(styles.$listContent)}

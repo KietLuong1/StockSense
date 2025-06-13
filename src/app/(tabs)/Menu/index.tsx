@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable react-native/no-inline-styles */
 import { Screen, Text } from "@/components"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { FontAwesome } from "@expo/vector-icons"
@@ -55,10 +53,10 @@ export default function Menu() {
           <FontAwesome name="chevron-right" size={16} color={useAppTheme().theme.colors.textDim} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={themed(styles.$settingItem)} onPress={() => router.push("/Menu/Location")}>
+        <TouchableOpacity style={themed(styles.$settingItem)} onPress={() => router.push("/Menu/Warehouse")}>
           <View style={themed(styles.$settingRow)}>
             <FontAwesome name="location-arrow" size={20} color={useAppTheme().theme.colors.text} />
-            <Text text="Location" style={themed(styles.$settingText)} />
+            <Text text="Warehouse" style={themed(styles.$settingText)} />
           </View>
           <FontAwesome name="chevron-right" size={16} color={useAppTheme().theme.colors.textDim} />
         </TouchableOpacity>

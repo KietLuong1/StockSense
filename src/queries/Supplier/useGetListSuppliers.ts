@@ -1,23 +1,21 @@
-/* eslint-disable prettier/prettier */
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { SupplierResponse } from './types'
-import { fetchSuppliers } from './api'
-
-
+import { UseQueryOptions, useQuery, useQueryClient } from "@tanstack/react-query"
+import { SupplierResponse } from "./types"
+import { fetchSuppliers } from "./api"
 
 export function useGetListSupplier(options?: UseQueryOptions<SupplierResponse[], Error>) {
   const {
     data,
     error,
     isFetching,
-    refetch: onGetAllListSupplier
+    refetch: onGetAllListSupplier,
   } = useQuery({
-    queryKey: ['suppliers'],
+    queryKey: ["suppliers"],
     queryFn: fetchSuppliers,
-    ...options
+    ...options,
   })
   const queryClient = useQueryClient()
 
-  const handleInvalidateListSupplier = () => queryClient.invalidateQueries({ queryKey: ['suppliers'] })
+  const handleInvalidateListSupplier = () =>
+    queryClient.invalidateQueries({ queryKey: ["suppliers"] })
   return { data, error, isFetching, onGetAllListSupplier, handleInvalidateListSupplier }
 }

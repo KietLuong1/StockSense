@@ -1,21 +1,22 @@
-/* eslint-disable prettier/prettier */
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { fetchTransactions } from './api'
-import { TransactionResponse } from './types'
+import { UseQueryOptions, useQuery, useQueryClient } from "@tanstack/react-query"
+import { TransactionResponse } from "./types"
+import { fetchTransactions } from "./api"
 
 export function useGetListTransactions(options?: UseQueryOptions<TransactionResponse[], Error>) {
   const {
     data,
     error,
     isFetching,
-    refetch: onGetAllListTransactions
+    refetch: onGetAllListTransaction,
   } = useQuery({
-    queryKey: ['imports'],
+    queryKey: ["transactions"],
     queryFn: fetchTransactions,
-    ...options
+    ...options,
   })
   const queryClient = useQueryClient()
 
-  const handleInvalidateListTransactions = () => queryClient.invalidateQueries({ queryKey: ['imports'] })
-  return { data, error, isFetching, onGetAllListTransactions, handleInvalidateListTransactions }
+  const handleInvalidateListTransactions = () =>
+    queryClient.invalidateQueries({ queryKey: ["transactions"] })
+
+  return { data, error, isFetching, onGetAllListTransaction, handleInvalidateListTransaction: handleInvalidateListTransactions }
 }

@@ -1,12 +1,17 @@
-/* eslint-disable prettier/prettier */
 export enum InventoryKey {
-    INVENTORY_ID = 'inventory_id',
-    PRODUCT_ID = 'product_id',
-    PRODUCT_NAME = 'product_name',
-    LOCATION_ID = 'location_id',
-    QUANTITY = 'quantity',
-    BATCH_NUMBER = 'batch_number',
-    IMPORT_DATE = 'import_date',
-    EXPIRY_DATE = 'expiry_date'
-  }
-  
+  ID = "id",
+  BATCH_NUMBER = "batch_number",
+  CREATED_AT = "created_at",
+  EXPIRY_DATE = "expiry_date",
+  LAST_COUNTED_DATE = "last_counted_date",
+  LAST_UPDATED = "last_updated",
+  LOCATION_CODE = "location_code",
+  MAX_STOCK_LEVEL = "max_stock_level",
+  QUANTITY_ON_HAND = "quantity_on_hand",
+  REORDER_LEVEL = "reorder_level",
+  RESERVED_QUANTITY = "reserved_quantity",
+  UNIT_COST = "unit_cost",
+  UPDATED_BY = "updated_by",
+  PRODUCT_ID = "product_id",
+  WAREHOUSE_ID = "warehouse_id"
+}

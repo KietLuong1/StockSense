@@ -30,12 +30,13 @@ const $headerActions: ThemedStyle<ViewStyle> = () => ({
 })
 
 const $filterButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  backgroundColor: colors.palette.primary500,
-  width: 36,
-  height: 36,
-  borderRadius: 18,
+  backgroundColor: colors.palette.primary400,
+  width: 40,
+  height: 40,
+  borderRadius: spacing.md,
   justifyContent: "center",
   alignItems: "center",
+  marginRight: spacing.sm,
 })
 
 const $filterIndicators: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -136,6 +137,16 @@ const $itemDetails: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginTop: spacing.xs,
 })
 
+const $itemFooter: ThemedStyle<ViewStyle> = () => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+})
+
+const $itemDate: ThemedStyle<TextStyle> = ({ colors }) => ({
+  fontSize: 14,
+  color: colors.error,
+})
+
 const $itemLocation: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 14,
   color: colors.textDim,
@@ -203,34 +214,34 @@ const $modalOverlay: ThemedStyle<ViewStyle> = () => ({
 
 const $filterModalContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   backgroundColor: colors.background,
-  borderTopLeftRadius: spacing.lg,
-  borderTopRightRadius: spacing.lg,
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
   padding: spacing.lg,
   maxHeight: "80%",
 })
 
-const $filterModalHeader: ThemedStyle<ViewStyle> = () => ({
+const $filterModalHeader: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  marginBottom: 20,
+  marginBottom: spacing.lg,
 })
 
 const $filterModalTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
-  fontSize: 18,
+  fontSize: 22,
   fontWeight: "bold",
   color: colors.text,
 })
 
 const $filterSection: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginBottom: spacing.md,
+  marginBottom: spacing.lg,
 })
 
 const $filterSectionTitle: ThemedStyle<TextStyle> = ({ colors }) => ({
-  fontSize: 16,
+  fontSize: 18,
   fontWeight: "600",
   color: colors.text,
-  marginBottom: 8,
+  marginBottom: 10,
 })
 
 const $filterOptions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -241,11 +252,10 @@ const $filterOptions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 
 const $filterOption: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   backgroundColor: colors.palette.neutral200,
-  borderRadius: spacing.sm,
-  paddingHorizontal: spacing.sm,
-  paddingVertical: spacing.xs,
-  marginHorizontal: spacing.xs / 2,
-  marginBottom: spacing.xs,
+  paddingHorizontal: spacing.md,
+  paddingVertical: spacing.sm,
+  borderRadius: spacing.md,
+  margin: spacing.xs / 2,
 })
 
 const $filterOptionSelected: ThemedStyle<ViewStyle> = ({ colors }) => ({
@@ -253,12 +263,13 @@ const $filterOptionSelected: ThemedStyle<ViewStyle> = ({ colors }) => ({
 })
 
 const $filterOptionText: ThemedStyle<TextStyle> = ({ colors }) => ({
-  fontSize: 14,
   color: colors.text,
+  fontSize: 16,
 })
 
 const $filterOptionTextSelected: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.palette.neutral100,
+  fontWeight: "bold",
 })
 
 const $filterActions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -268,35 +279,33 @@ const $filterActions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
 })
 
 const $resetButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  backgroundColor: colors.palette.neutral200,
-  borderRadius: spacing.sm,
-  paddingHorizontal: spacing.md,
-  paddingVertical: spacing.sm,
   flex: 1,
-  marginRight: spacing.sm,
+  backgroundColor: colors.palette.neutral200,
+  paddingVertical: spacing.md,
+  borderRadius: spacing.md,
   alignItems: "center",
+  marginRight: spacing.sm,
 })
 
 const $resetButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
-  fontSize: 16,
-  fontWeight: "600",
   color: colors.text,
+  fontWeight: "600",
+  fontSize: 16,
 })
 
 const $applyButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  backgroundColor: colors.palette.primary500,
-  borderRadius: spacing.sm,
-  paddingHorizontal: spacing.md,
-  paddingVertical: spacing.sm,
   flex: 1,
-  marginLeft: spacing.sm,
+  backgroundColor: colors.palette.primary500,
+  paddingVertical: spacing.md,
+  borderRadius: spacing.md,
   alignItems: "center",
+  marginLeft: spacing.sm,
 })
 
 const $applyButtonText: ThemedStyle<TextStyle> = ({ colors }) => ({
-  fontSize: 16,
-  fontWeight: "600",
   color: colors.palette.neutral100,
+  fontWeight: "600",
+  fontSize: 16,
 })
 
 export default {
@@ -336,6 +345,8 @@ export default {
   $statusBadge,
   $statusText,
   $itemDetails,
+  $itemFooter,
+  $itemDate,
   $itemLocation,
   $itemCapacity,
   $itemDescription,

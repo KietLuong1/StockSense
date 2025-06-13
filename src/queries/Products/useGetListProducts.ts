@@ -1,22 +1,22 @@
-/* eslint-disable prettier/prettier */
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ProductResponse } from './types'
-import { fetchProducts } from './api'
-
+import { UseQueryOptions, useQuery, useQueryClient } from "@tanstack/react-query"
+import { ProductResponse } from "./types"
+import { fetchProducts } from "./api"
 
 export function useGetListProduct(options?: UseQueryOptions<ProductResponse[], Error>) {
   const {
     data,
     error,
     isFetching,
-    refetch: onGetAllListProduct
+    refetch: onGetAllListProduct,
   } = useQuery({
-    queryKey: ['products'],
+    queryKey: ["products"],
     queryFn: fetchProducts,
-    ...options
+    ...options,
   })
   const queryClient = useQueryClient()
 
-  const handleInvalidateListProduct = () => queryClient.invalidateQueries({ queryKey: ['products'] })
+  const handleInvalidateListProduct = () =>
+    queryClient.invalidateQueries({ queryKey: ["products"] })
+
   return { data, error, isFetching, onGetAllListProduct, handleInvalidateListProduct }
 }

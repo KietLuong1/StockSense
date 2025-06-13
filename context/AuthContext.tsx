@@ -1,9 +1,7 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createContext, useContext, useState, useEffect, FC, ReactNode } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { router } from "expo-router"
-import * as SecureStore from "expo-secure-store" 
+import * as SecureStore from "expo-secure-store"
 import { axiosAccount } from "@/services/http"
 
 interface AuthContextType {
@@ -15,16 +13,13 @@ interface AuthContextType {
   logout: () => Promise<void>
 }
 
-// Define a type for user data
 interface UserData {
   userRole?: string
   userId?: string
   email?: string
   name?: string
-  // Add other user properties as needed
 }
 
-// Define AuthState type
 interface AuthState {
   token?: string
   userData?: UserData
@@ -38,9 +33,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [userRole, setUserRole] = useState<string | undefined>()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [authState, setAuthState] = useState<AuthState | null>(null);
-
-  
+  const [authState, setAuthState] = useState<AuthState | null>(null)
 
   useEffect(() => {
     const loadAuthState = async () => {
@@ -93,9 +86,9 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       setAuthState({
         token: token,
         userData: userData,
-        isAuthenticated: true
-      });
-      router.replace("/(tabs)/Inventory");        
+        isAuthenticated: true,
+      })
+      router.replace("/(tabs)/Inventory")
     } catch (error) {
       console.error("Error during login:", error)
       throw error
@@ -104,35 +97,38 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const logout = async () => {
     try {
-      console.log("Logging out user");
-      setIsAuthenticated(false);
-      setAuthState(null);
-      setUser(undefined);
-      setUserRole(undefined);
-    
-      if (SecureStore && typeof SecureStore.isAvailableAsync === 'function' && 
-          await SecureStore.isAvailableAsync()) {
-        await SecureStore.deleteItemAsync("accessToken");
-        await SecureStore.deleteItemAsync("refreshToken");
+      console.log("Logging out user")
+      setIsAuthenticated(false)
+      setAuthState(null)
+      setUser(undefined)
+      setUserRole(undefined)
+
+      if (
+        SecureStore &&
+        typeof SecureStore.isAvailableAsync === "function" &&
+        (await SecureStore.isAvailableAsync())
+      ) {
+        await SecureStore.deleteItemAsync("accessToken")
+        await SecureStore.deleteItemAsync("refreshToken")
       } else {
-        await AsyncStorage.removeItem("accessToken");
-        await AsyncStorage.removeItem("refreshToken");
+        await AsyncStorage.removeItem("accessToken")
+        await AsyncStorage.removeItem("refreshToken")
       }
-      
-      delete axiosAccount.defaults.headers.common['Authorization'];
-    
+
+      delete axiosAccount.defaults.headers.common["Authorization"]
+
       // try {
       //   await axiosAccount.post('/auth/logout');
       // } catch (serverLogoutError) {
       //   console.log("Server logout failed, but continuing with client logout");
       // }
-      
-      console.log("Logout successful");
-      router.replace("/screens/Signin");
+
+      console.log("Logout successful")
+      router.replace("/screens/Signin")
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Logout error:", error)
     }
-  };
+  }
 
   return (
     <AuthContext.Provider
