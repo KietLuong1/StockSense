@@ -11,7 +11,6 @@ import { useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { Alert, Image, ImageStyle, Pressable, TextStyle, View, ViewStyle } from "react-native"
 
-
 const logoImage = require("../../../assets/images/login-1.png")
 
 export type FieldType = {
@@ -39,40 +38,40 @@ export default function Signin() {
 
   const onSubmit: SubmitHandler<FieldType> = async (data) => {
     try {
-      const response = await loginApi(data);
-    
-      console.log("Response received:", response);
-      
+      const response = await loginApi(data)
+
+      console.log("Response received:", response)
+
       if (!response) {
-        Alert.alert("Login error", "No response from server");
-        return;
+        Alert.alert("Login error", "No response from server")
+        return
       }
-      
-      const { accessToken } = response;
-      
+
+      const { accessToken } = response
+
       if (accessToken) {
         try {
-          login(accessToken, response.refreshToken);
+          login(accessToken, response.refreshToken)
           // setTimeout(() => {
           //   router.replace("/TabsLayout");
           // }, 100);
         } catch (authError) {
-          console.error("Auth context error:", authError);
-          Alert.alert("Login Error", "Failed to save authentication data");
+          console.error("Auth context error:", authError)
+          Alert.alert("Login Error", "Failed to save authentication data")
         }
       } else {
-        Alert.alert("Login error", "Invalid credentials");
+        Alert.alert("Login error", "Invalid credentials")
       }
     } catch (error: any) {
-      console.error("Login error details:", error);
-      
+      console.error("Login error details:", error)
+
       if (error.message?.includes("Network Error")) {
-        Alert.alert("Network Error", "Please check your internet connection");
+        Alert.alert("Network Error", "Please check your internet connection")
       } else {
-        Alert.alert("Login Error", "An error occurred during login");
+        Alert.alert("Login Error", "An error occurred during login")
       }
     }
-  };
+  }
 
   const handleForgotPassword = () => {
     router.push("/screens/ForgotPassword")
@@ -90,7 +89,8 @@ export default function Signin() {
           <Text preset="heading" style={themed($title)}>
             Welcome Back
           </Text>
-          <Text style={themed($subtitle)}>Sign in to continue to StockSense</Text>
+          <Text style={themed($subtitle)}>Sign in to continue to</Text>
+          <Text style={themed($subtitle)}>Warehouse Management System</Text>
         </View>
 
         <View style={themed($form)}>
@@ -159,24 +159,24 @@ export default function Signin() {
           </View>
 
           <View style={themed($actionContainer)}>
-          <Controller
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <View style={themed($rememberContainer)}>
-                <Pressable
-                  style={[themed($checkbox), value && themed($checkboxSelected)]}
-                  onPress={() => onChange(!value)}
-                >
-                  {value && <MaterialCommunityIcons name="check" size={16} color="#fff" />}
-                </Pressable>
-                <Text style={themed($rememberText)}>Remember me</Text>
-              </View>
-            )}
-            name="remember"
-          />
-          <Pressable onPress={handleForgotPassword}>
-            <Text style={themed($forgotPassword)}>Forgot Password?</Text>
-          </Pressable>
+            <Controller
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <View style={themed($rememberContainer)}>
+                  <Pressable
+                    style={[themed($checkbox), value && themed($checkboxSelected)]}
+                    onPress={() => onChange(!value)}
+                  >
+                    {value && <MaterialCommunityIcons name="check" size={16} color="#fff" />}
+                  </Pressable>
+                  <Text style={themed($rememberText)}>Remember me</Text>
+                </View>
+              )}
+              name="remember"
+            />
+            <Pressable onPress={handleForgotPassword}>
+              <Text style={themed($forgotPassword)}>Forgot Password?</Text>
+            </Pressable>
           </View>
         </View>
 
@@ -289,7 +289,7 @@ const $forgotPassword: ThemedStyle<TextStyle> = ({ colors }) => ({
 const $actions: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   alignItems: "center",
   marginTop: spacing.sm,
-  marginBottom:spacing.xl
+  marginBottom: spacing.xl,
 })
 
 const $signInButton: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
@@ -345,9 +345,9 @@ const $socialButton: ThemedStyle<ViewStyle> = ({ colors }) => ({
 })
 
 const $actionContainer: ThemedStyle<ViewStyle> = () => ({
-  flexDirection: 'row', 
-  justifyContent: 'space-between',
-  alignItems: 'center',
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
 })
 const $rememberContainer: ThemedStyle<ViewStyle> = () => ({
   flexDirection: "row",

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Button, Screen, Text } from "@/components"
 import { ThemedStyle } from "@/theme"
 import { useAppTheme } from "@/utils/useAppTheme"
@@ -24,10 +23,10 @@ export default function Welcome() {
 
       <View style={[$bottomSection, $bottomInsets]}>
         <Text preset="heading" style={themed($title)}>
-          Welcome to StockSense
+          Welcome to Warehouse Management System
         </Text>
         <Text style={themed($subtitle)}>
-          Track, analyze, and optimize your investments with real-time market insights
+          Efficiently track, manage, and optimize your warehouse in real time.
         </Text>
 
         <View style={themed($buttonContainer)}>
@@ -62,7 +61,7 @@ const $welcomeIllustration: ImageStyle = {
 
 const $bottomSection: ViewStyle = {
   flex: 2,
-  paddingHorizontal: 24,
+  paddingHorizontal: 20,
   justifyContent: "flex-end",
 }
 
@@ -114,6 +113,7 @@ const $buttonText: ThemedStyle<TextStyle> = ({ colors }) => ({
 
 const $footerText: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
   fontSize: 12,
+  paddingHorizontal: 55,
   textAlign: "center",
   color: colors.textDim,
   marginTop: spacing.sm,
