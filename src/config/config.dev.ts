@@ -7,4 +7,6 @@
  */
 export default {
   API_URL: "https://api.rss2json.com/v1/",
+  AUTH_URL: "http://localhost:8080/api/v1", // Local loginservice
+  WAREHOUSE_URL: "http://localhost:8082/api/v1", // Local warehouse-svc
 }

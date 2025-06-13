@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable react-native/no-inline-styles */
 import { Screen, Text } from "@/components"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { FontAwesome } from "@expo/vector-icons"
@@ -9,10 +7,12 @@ import {
   Alert,
   FlatList,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   RefreshControl,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -30,7 +30,31 @@ export default function Suppliers() {
   const [isLoading, setIsLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+  const [sortBy, setSortBy] = useState<"name" | "address" | "contactInfo">("name")
+  const [filterModalVisible, setFilterModalVisible] = useState(false)
+
+  const [tempSortBy, setTempSortBy] = useState<"name" | "address" | "contactInfo">("name")
+  const [tempSortOrder, setTempSortOrder] = useState<"asc" | "desc">("asc")
+
   const { data: suppliersData, error: suppliersError } = useGetListSupplier()
+
+  const openFilterModal = () => {
+    setTempSortBy(sortBy)
+    setTempSortOrder(sortOrder)
+    setFilterModalVisible(true)
+  }
+
+  const applyFilters = () => {
+    setSortBy(tempSortBy)
+    setSortOrder(tempSortOrder)
+    setFilterModalVisible(false)
+  }
+
+  const resetFilters = () => {
+    setTempSortBy("name")
+    setTempSortOrder("asc")
+  }
 
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -39,13 +63,13 @@ export default function Suppliers() {
         if (suppliersError) {
           throw suppliersError
         }
-        
+
         if (suppliersData) {
           setSuppliers(suppliersData)
         }
       } catch (error) {
         console.error("Error fetching suppliers:", error)
-        Alert.alert("Error", "Failed to load supplier data")
+        Alert.alert("Error", "Failed to load suppliers data")
       } finally {
         setIsLoading(false)
       }
@@ -61,41 +85,51 @@ export default function Suppliers() {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter((item) => {
         const supplierName = item.name.toLowerCase()
-        const supplierEmail = item.email.toLowerCase()
+        const supplierContactInfo = item.contactInfo.toLowerCase()
         const supplierAddress = item.address.toLowerCase()
         return (
           supplierName.includes(query) ||
-          supplierEmail.includes(query) ||
+          supplierContactInfo.includes(query) ||
           supplierAddress.includes(query)
         )
       })
     }
 
+    filtered.sort((a, b) => {
+      if (sortBy === "name") {
+        return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+      } else if (sortBy === "address") {
+        return sortOrder === "asc"
+          ? a.address.localeCompare(b.address)
+          : b.address.localeCompare(a.address)
+      } else if (sortBy === "contactInfo") {
+        return sortOrder === "asc"
+          ? a.contactInfo.localeCompare(b.contactInfo)
+          : b.contactInfo.localeCompare(a.contactInfo)
+      } else {
+        return 0
+      }
+    })
+
     setFilteredSuppliers(filtered)
-  }, [suppliers, searchQuery])
+  }, [suppliers, searchQuery, sortOrder, sortBy])
 
   const onRefresh = async () => {
     setRefreshing(true)
-
+    setIsLoading(true)
     try {
       if (suppliersData) {
         setSuppliers(suppliersData)
       }
     } catch (error) {
       console.error("Error refreshing suppliers:", error)
-      Alert.alert("Error", "Failed to refresh supplier data")
+      Alert.alert("Error", "Failed to refresh suppliers data")
     } finally {
-      setRefreshing(false)
+      setTimeout(() => {
+        setRefreshing(false)
+        setIsLoading(false)
+      }, 800)
     }
-  }
-
-  const formatPhone = (phone: number) => {
-    const phoneString = phone.toString()
-    // Format phone number as (XXX) XXX-XXXX if it's 10 digits
-    if (phoneString.length === 10) {
-      return `(${phoneString.substring(0, 3)}) ${phoneString.substring(3, 6)}-${phoneString.substring(6)}`
-    }
-    return phoneString
   }
 
   const renderItem = ({ item }: { item: SupplierResponse }) => {
@@ -105,20 +139,24 @@ export default function Suppliers() {
         onPress={() =>
           Alert.alert(
             item.name,
-            `Email: ${item.email}\nPhone: ${formatPhone(item.phone)}\nAddress: ${item.address}\nCreated: ${new Date(item.create_at).toLocaleDateString()}`
+            `Name: ${item.name}
+            \nContact Info: ${item.contactInfo}
+            \nAddress: ${item.address}`,
           )
         }
       >
         <View style={themed(styles.$itemContent)}>
           <View style={themed(styles.$itemHeader)}>
             <Text style={themed(styles.$itemName)}>{item.name}</Text>
-            <Text style={themed(styles.$itemEmail)}>{item.email}</Text>
           </View>
 
           <View style={themed(styles.$itemDetails)}>
-            <Text style={themed(styles.$itemPhone)}>{formatPhone(item.phone)}</Text>
-            <Text style={themed(styles.$itemAddress)} numberOfLines={1}>
-              {item.address}
+            <Text style={themed(styles.$itemAddress)}>Address: {item.address}</Text>
+          </View>
+
+          <View style={themed(styles.$itemDetails)}>
+            <Text style={themed(styles.$itemContactInfo)}>
+              Contact Information: {item.contactInfo}
             </Text>
           </View>
         </View>
@@ -142,6 +180,143 @@ export default function Suppliers() {
     )
   }
 
+  const renderFilterModal = () => {
+    return (
+      <Modal
+        visible={filterModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setFilterModalVisible(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)}>
+          <View style={themed(styles.$modalOverlay)}>
+            <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                style={themed(styles.$filterModalContainer)}
+              >
+                <View style={themed(styles.$filterModalContainer)}>
+                  <View style={themed(styles.$filterModalHeader)}>
+                    <Text style={themed(styles.$filterModalTitle)}>Filter Products</Text>
+                    <TouchableOpacity onPress={() => setFilterModalVisible(false)}>
+                      <FontAwesome name="times" size={24} color={theme.colors.text} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={themed(styles.$filterSection)}>
+                    <Text style={themed(styles.$filterSectionTitle)}>Sort By</Text>
+                    <View style={themed(styles.$filterOptions)}>
+                      <TouchableOpacity
+                        style={[
+                          themed(styles.$filterOption),
+                          tempSortBy === "name" && themed(styles.$filterOptionSelected),
+                        ]}
+                        onPress={() => setTempSortBy("name")}
+                      >
+                        <Text
+                          style={[
+                            themed(styles.$filterOptionText),
+                            tempSortBy === "name" && themed(styles.$filterOptionTextSelected),
+                          ]}
+                        >
+                          Name
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[
+                          themed(styles.$filterOption),
+                          tempSortBy === "address" && themed(styles.$filterOptionSelected),
+                        ]}
+                        onPress={() => setTempSortBy("address")}
+                      >
+                        <Text
+                          style={[
+                            themed(styles.$filterOptionText),
+                            tempSortBy === "address" && themed(styles.$filterOptionTextSelected),
+                          ]}
+                        >
+                          Address
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[
+                          themed(styles.$filterOption),
+                          tempSortBy === "contactInfo" && themed(styles.$filterOptionSelected),
+                        ]}
+                        onPress={() => setTempSortBy("contactInfo")}
+                      >
+                        <Text
+                          style={[
+                            themed(styles.$filterOptionText),
+                            tempSortBy === "contactInfo" &&
+                              themed(styles.$filterOptionTextSelected),
+                          ]}
+                        >
+                          Contact Infomation
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <View style={themed(styles.$filterSection)}>
+                    <Text style={themed(styles.$filterSectionTitle)}>Sort Order</Text>
+                    <View style={themed(styles.$filterOptions)}>
+                      <TouchableOpacity
+                        style={[
+                          themed(styles.$filterOption),
+                          tempSortOrder === "asc" && themed(styles.$filterOptionSelected),
+                        ]}
+                        onPress={() => setTempSortOrder("asc")}
+                      >
+                        <Text
+                          style={[
+                            themed(styles.$filterOptionText),
+                            tempSortOrder === "asc" && themed(styles.$filterOptionTextSelected),
+                          ]}
+                        >
+                          Ascending
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[
+                          themed(styles.$filterOption),
+                          tempSortOrder === "desc" && themed(styles.$filterOptionSelected),
+                        ]}
+                        onPress={() => setTempSortOrder("desc")}
+                      >
+                        <Text
+                          style={[
+                            themed(styles.$filterOptionText),
+                            tempSortOrder === "desc" && themed(styles.$filterOptionTextSelected),
+                          ]}
+                        >
+                          Descending
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <View style={themed(styles.$filterActions)}>
+                    <TouchableOpacity style={themed(styles.$resetButton)} onPress={resetFilters}>
+                      <Text style={themed(styles.$resetButtonText)}>Reset</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={themed(styles.$applyButton)} onPress={applyFilters}>
+                      <Text style={themed(styles.$applyButtonText)}>Apply</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </KeyboardAvoidingView>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    )
+  }
+
   return (
     <KeyboardAvoidingView
       style={styles.$root}
@@ -153,8 +328,12 @@ export default function Suppliers() {
           <Text preset="heading" style={themed(styles.$headerText)}>
             Suppliers
           </Text>
+          <View style={themed(styles.$headerActions)}>
+            <TouchableOpacity style={themed(styles.$filterButton)} onPress={openFilterModal}>
+              <FontAwesome name="filter" size={18} color={theme.colors.palette.neutral100} />
+            </TouchableOpacity>
+          </View>
         </View>
-
         <View style={themed(styles.$searchContainer)}>
           <View style={themed(styles.$searchBar)}>
             <FontAwesome name="search" size={16} color={theme.colors.palette.neutral500} />
@@ -176,17 +355,44 @@ export default function Suppliers() {
             )}
           </View>
         </View>
-
+        {(sortBy !== "name" || sortOrder !== "asc") && (
+          <View style={themed(styles.$filterIndicators)}>
+            {(sortBy !== "name" || sortOrder !== "asc") && (
+              <View style={themed(styles.$filterTag)}>
+                <Text style={themed(styles.$filterTagText)}>
+                  Sort:{" "}
+                  {sortBy === "name"
+                    ? "Name"
+                    : sortBy === "address"
+                      ? "Address"
+                      : "Contact Information"}
+                  ({sortOrder === "asc" ? "↑" : "↓"})
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setSortBy("name")
+                    setSortOrder("asc")
+                  }}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <FontAwesome name="times" size={12} color={theme.colors.text} />
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}{" "}
         {isLoading ? (
           <View style={themed(styles.$loadingContainer)}>
             <ActivityIndicator size="large" color={theme.colors.palette.primary500} />
-            <Text style={themed(styles.$loadingText)}>Loading suppliers...</Text>
+            <Text style={themed(styles.$loadingText)}>
+              {refreshing ? "Refreshing products..." : "Loading products..."}
+            </Text>
           </View>
         ) : (
           <FlatList
             data={filteredSuppliers}
             renderItem={renderItem}
-            keyExtractor={(item) => item.supplierId}
+            keyExtractor={(item) => item.id}
             contentContainerStyle={themed(styles.$listContent)}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={renderEmptyList}
@@ -200,6 +406,7 @@ export default function Suppliers() {
             }
           />
         )}
+        {renderFilterModal()}
       </Screen>
     </KeyboardAvoidingView>
   )

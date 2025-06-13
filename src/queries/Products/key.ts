@@ -1,13 +1,13 @@
-/* eslint-disable prettier/prettier */
 export enum ProductKey {
-  PRODUCT_ID = "product_id",
+  ID = "id",
   NAME = "name",
-  CATEGORY = "category",
-  DESCRIPTION = "description",
+  SKU = "sku",
   PRICE = "price",
-  STATUS = "status",
-  CREATE_DATE = "create_date",
-  EXPIRED_DATE = "expired_date",
-  MINIMUM_QUANTITY = "minimum_quantity",
-  LIMIT_QUANTITY = "limit_quantity",
+  STOCK_QUANTITY = "stock_quantity",
+  DESCRIPTION = "description",
+  EXPIRY_DATE = "expiry_date",
+  CREATED_AT = "create_at",
+  IMAGE_URL = "image_url",
+  CATEGORY_ID = "category_id",
+  WAREHOUSE_ID = "warehouse_id",
 }

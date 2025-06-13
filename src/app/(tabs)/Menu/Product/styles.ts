@@ -226,6 +226,12 @@ const $itemHeader: ThemedStyle<ViewStyle> = () => ({
   marginBottom: 8,
 })
 
+const $itemStockQuantity: ThemedStyle<TextStyle> = ({ colors }) => ({
+  fontSize: 14,
+  fontWeight: "500",
+  color: colors.text,
+})
+
 const $itemName: ThemedStyle<TextStyle> = ({ colors }) => ({
   fontSize: 20,
   fontWeight: "bold",
@@ -243,6 +249,16 @@ const $itemDetails: ThemedStyle<ViewStyle> = () => ({
   flexDirection: "row",
   justifyContent: "space-between",
   marginBottom: 8,
+})
+
+const $itemFooter: ThemedStyle<ViewStyle> = () => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+})
+
+const $itemDate: ThemedStyle<TextStyle> = ({ colors }) => ({
+  fontSize: 14,
+  color: colors.error,
 })
 
 const $itemId: ThemedStyle<TextStyle> = ({ colors }) => ({
@@ -343,13 +359,17 @@ export default {
   $headerText,
   $itemContainer,
   $itemContent,
+  $itemDate,
   $itemDetails,
+  $itemFooter,
   $itemHeader,
+  $itemStockQuantity,
   $itemId,
   $itemName,
   $itemPrice,
   $listContent,
-  $loadingContainer,  $loadingText,
+  $loadingContainer,
+  $loadingText,
   $modalOverlay,
   $resetButton,
   $resetButtonText,

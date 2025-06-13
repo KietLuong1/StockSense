@@ -232,6 +232,11 @@ const $itemName: ThemedStyle<TextStyle> = ({ colors }) => ({
   flex: 1,
 })
 
+const $itemFooter: ThemedStyle<ViewStyle> = () => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+})
+
 const $itemDetails: ThemedStyle<ViewStyle> = () => ({
   flexDirection: "row",
   justifyContent: "space-between",
@@ -332,6 +337,7 @@ export default {
   $itemContainer,
   $itemContent,
   $itemDate,
+  $itemFooter,
   $itemDetails,
   $itemHeader,
   $itemId,

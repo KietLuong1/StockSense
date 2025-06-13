@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable react-native/no-inline-styles */
 import { Screen, Text } from "@/components"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { FontAwesome } from "@expo/vector-icons"
@@ -16,6 +14,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  ScrollView,
 } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ProductResponse } from "@/queries/Products/types"
@@ -29,10 +28,12 @@ export default function Product() {
   const [products, setProducts] = useState<ProductResponse[]>([])
   const [filteredProducts, setFilteredProducts] = useState<ProductResponse[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("All")
-  const [categories, setCategories] = useState<string[]>(["All"])
   const [isLoading, setIsLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+
+  const [selectedCategory, setSelectedCategory] = useState("All")
+  const [categories, setCategories] = useState<string[]>(["All"])
+
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [sortBy, setSortBy] = useState<"name" | "price" | "category">("name")
   const [filterModalVisible, setFilterModalVisible] = useState(false)
@@ -70,19 +71,15 @@ export default function Product() {
         if (productsError) {
           throw productsError
         }
-        
         if (productsData) {
           setProducts(productsData)
-          
           // Extract unique categories
-          const uniqueCategories = Array.from(
-            new Set(productsData.map(item => item.category))
-          )
+          const uniqueCategories = Array.from(new Set(productsData.map((item) => item.categoryId)))
           setCategories(["All", ...uniqueCategories])
         }
       } catch (error) {
         console.error("Error fetching products:", error)
-        Alert.alert("Error", "Failed to load product data")
+        Alert.alert("Error", "Failed to load products data")
       } finally {
         setIsLoading(false)
       }
@@ -95,60 +92,58 @@ export default function Product() {
     let filtered = [...products]
 
     if (selectedCategory !== "All") {
-      filtered = filtered.filter((item) => item.category === selectedCategory)
+      filtered = filtered.filter((item) => item.categoryId === selectedCategory)
     }
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter((item) => {
         const productName = item.name.toLowerCase()
-        const productId = item.productId.toLowerCase()
-        return (
-          productName.includes(query) ||
-          productId.includes(query)
-        )
+        const productId = (item.id ?? "").toLowerCase()
+        return productName.includes(query) || productId.includes(query)
       })
     }
 
     filtered.sort((a, b) => {
       if (sortBy === "name") {
-        return sortOrder === "asc" 
-          ? a.name.localeCompare(b.name) 
-          : b.name.localeCompare(a.name)
+        return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
       } else if (sortBy === "category") {
-        return sortOrder === "asc" 
-          ? a.category.localeCompare(b.category) 
-          : b.category.localeCompare(a.category)
+        return sortOrder === "asc"
+          ? a.categoryId.localeCompare(b.categoryId)
+          : b.categoryId.localeCompare(a.categoryId)
       } else {
-        return sortOrder === "asc" 
-          ? a.price - b.price 
-          : b.price - a.price
+        return sortOrder === "asc" ? a.price - b.price : b.price - a.price
       }
     })
 
     setFilteredProducts(filtered)
   }, [products, searchQuery, selectedCategory, sortOrder, sortBy])
+
   const onRefresh = async () => {
     setRefreshing(true)
     setIsLoading(true)
-
     try {
       if (productsData) {
         setProducts(productsData)
       }
     } catch (error) {
       console.error("Error refreshing products:", error)
-      Alert.alert("Error", "Failed to refresh product data")
+      Alert.alert("Error", "Failed to refresh products data")
     } finally {
       setTimeout(() => {
         setRefreshing(false)
         setIsLoading(false)
-      }, 800) // Add a slight delay for better UX
+      }, 800)
     }
   }
 
   const formatPrice = (price: number) => {
-    return `$${price.toFixed(2)}`
+    return `${price.toLocaleString("vi-VN")} VND`
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString()
   }
 
   const renderItem = ({ item }: { item: ProductResponse }) => {
@@ -158,7 +153,13 @@ export default function Product() {
         onPress={() =>
           Alert.alert(
             item.name,
-            `Product ID: ${item.productId}\nCategory: ${item.category}\nStatus: ${item.status}\nPrice: ${formatPrice(item.price)}\nDescription: ${item.description}`
+            `Sku: ${item.sku}
+            \nPrice: ${formatPrice(item.price)}
+            \nStock Quantity: ${item.stockQuantity}
+            \nCreated At: ${formatDate(item.createdAt ?? "")}
+            \nExpiry Date: ${formatDate(item.expiryDate ?? "")}
+            \nDescription: ${item.description}
+            `,
           )
         }
       >
@@ -169,19 +170,13 @@ export default function Product() {
           </View>
 
           <View style={themed(styles.$itemDetails)}>
-            <Text style={themed(styles.$itemId)}>ID: {item.productId}</Text>
-            <View style={themed(styles.$categoryBadge)}>
-              <Text style={themed(styles.$categoryText)}>{item.category}</Text>
-            </View>
-            <View style={[
-              themed(styles.$statusBadge), 
-              { backgroundColor: item.status === 'Active' ? theme.colors.palette.accent100 : theme.colors.palette.neutral300 }
-            ]}>
-              <Text style={[
-                themed(styles.$statusText),
-                { color: item.status === 'Active' ? theme.colors.palette.accent500 : theme.colors.palette.neutral700 }
-              ]}>{item.status}</Text>
-            </View>
+            <Text style={themed(styles.$itemId)}>SKU: {item.sku}</Text>
+            <Text style={themed(styles.$itemStockQuantity)}>Quantity: {item.stockQuantity}</Text>
+          </View>
+
+          <View style={themed(styles.$itemFooter)}>
+            <Text style={themed(styles.$itemDate)}>Created: {formatDate(item.createdAt)}</Text>
+            <Text style={themed(styles.$itemDate)}>Expiry: {formatDate(item.expiryDate)}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -198,9 +193,7 @@ export default function Product() {
             ? "No matching products found"
             : "No products available"}
         </Text>
-        <Text style={themed(styles.$emptyText)}>
-          Pull down to refresh the list
-        </Text>
+        <Text style={themed(styles.$emptyText)}>Pull down to refresh the list</Text>
       </View>
     )
   }
@@ -216,144 +209,152 @@ export default function Product() {
         <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)}>
           <View style={themed(styles.$modalOverlay)}>
             <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-              <View style={themed(styles.$filterModalContainer)}>
-                <View style={themed(styles.$filterModalHeader)}>
-                  <Text style={themed(styles.$filterModalTitle)}>Filter Products</Text>
-                  <TouchableOpacity onPress={() => setFilterModalVisible(false)}>
-                    <FontAwesome name="times" size={24} color={theme.colors.text} />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={themed(styles.$filterSection)}>
-                  <Text style={themed(styles.$filterSectionTitle)}>Category</Text>
-                  <View style={themed(styles.$filterOptions)}>
-                    {categories.map((category) => (
-                      <TouchableOpacity
-                        key={category}
-                        style={[
-                          themed(styles.$filterOption),
-                          tempCategory === category && themed(styles.$filterOptionSelected),
-                        ]}
-                        onPress={() => setTempCategory(category)}
-                      >
-                        <Text
-                          style={[
-                            themed(styles.$filterOptionText),
-                            tempCategory === category && themed(styles.$filterOptionTextSelected),
-                          ]}
-                        >
-                          {category}
-                        </Text>
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                style={themed(styles.$filterModalContainer)}
+              >
+                <ScrollView showsVerticalScrollIndicator={true}>
+                  <View style={themed(styles.$filterModalContainer)}>
+                    <View style={themed(styles.$filterModalHeader)}>
+                      <Text style={themed(styles.$filterModalTitle)}>Filter Products</Text>
+                      <TouchableOpacity onPress={() => setFilterModalVisible(false)}>
+                        <FontAwesome name="times" size={24} color={theme.colors.text} />
                       </TouchableOpacity>
-                    ))}
+                    </View>
+
+                    {/* <View style={themed(styles.$filterSection)}>
+                      <Text style={themed(styles.$filterSectionTitle)}>Category</Text>
+                      <View style={themed(styles.$filterOptions)}>
+                        {categories.map((category) => (
+                          <TouchableOpacity
+                            key={category}
+                            style={[
+                              themed(styles.$filterOption),
+                              tempCategory === category && themed(styles.$filterOptionSelected),
+                            ]}
+                            onPress={() => setTempCategory(category)}
+                          >
+                            <Text
+                              style={[
+                                themed(styles.$filterOptionText),
+                                tempCategory === category &&
+                                  themed(styles.$filterOptionTextSelected),
+                              ]}
+                            >
+                              {category}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View> */}
+
+                    <View style={themed(styles.$filterSection)}>
+                      <Text style={themed(styles.$filterSectionTitle)}>Sort By</Text>
+                      <View style={themed(styles.$filterOptions)}>
+                        <TouchableOpacity
+                          style={[
+                            themed(styles.$filterOption),
+                            tempSortBy === "name" && themed(styles.$filterOptionSelected),
+                          ]}
+                          onPress={() => setTempSortBy("name")}
+                        >
+                          <Text
+                            style={[
+                              themed(styles.$filterOptionText),
+                              tempSortBy === "name" && themed(styles.$filterOptionTextSelected),
+                            ]}
+                          >
+                            Name
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={[
+                            themed(styles.$filterOption),
+                            tempSortBy === "price" && themed(styles.$filterOptionSelected),
+                          ]}
+                          onPress={() => setTempSortBy("price")}
+                        >
+                          <Text
+                            style={[
+                              themed(styles.$filterOptionText),
+                              tempSortBy === "price" && themed(styles.$filterOptionTextSelected),
+                            ]}
+                          >
+                            Price
+                          </Text>
+                        </TouchableOpacity>
+
+                        {/* <TouchableOpacity
+                          style={[
+                            themed(styles.$filterOption),
+                            tempSortBy === "category" && themed(styles.$filterOptionSelected),
+                          ]}
+                          onPress={() => setTempSortBy("category")}
+                        >
+                          <Text
+                            style={[
+                              themed(styles.$filterOptionText),
+                              tempSortBy === "category" && themed(styles.$filterOptionTextSelected),
+                            ]}
+                          >
+                            Category
+                          </Text>
+                        </TouchableOpacity> */}
+                      </View>
+                    </View>
+
+                    <View style={themed(styles.$filterSection)}>
+                      <Text style={themed(styles.$filterSectionTitle)}>Sort Order</Text>
+                      <View style={themed(styles.$filterOptions)}>
+                        <TouchableOpacity
+                          style={[
+                            themed(styles.$filterOption),
+                            tempSortOrder === "asc" && themed(styles.$filterOptionSelected),
+                          ]}
+                          onPress={() => setTempSortOrder("asc")}
+                        >
+                          <Text
+                            style={[
+                              themed(styles.$filterOptionText),
+                              tempSortOrder === "asc" && themed(styles.$filterOptionTextSelected),
+                            ]}
+                          >
+                            Ascending
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={[
+                            themed(styles.$filterOption),
+                            tempSortOrder === "desc" && themed(styles.$filterOptionSelected),
+                          ]}
+                          onPress={() => setTempSortOrder("desc")}
+                        >
+                          <Text
+                            style={[
+                              themed(styles.$filterOptionText),
+                              tempSortOrder === "desc" && themed(styles.$filterOptionTextSelected),
+                            ]}
+                          >
+                            Descending
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    <View style={themed(styles.$filterActions)}>
+                      <TouchableOpacity style={themed(styles.$resetButton)} onPress={resetFilters}>
+                        <Text style={themed(styles.$resetButtonText)}>Reset</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity style={themed(styles.$applyButton)} onPress={applyFilters}>
+                        <Text style={themed(styles.$applyButtonText)}>Apply</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-
-                <View style={themed(styles.$filterSection)}>
-                  <Text style={themed(styles.$filterSectionTitle)}>Sort By</Text>
-                  <View style={themed(styles.$filterOptions)}>
-                    <TouchableOpacity
-                      style={[
-                        themed(styles.$filterOption),
-                        tempSortBy === "name" && themed(styles.$filterOptionSelected),
-                      ]}
-                      onPress={() => setTempSortBy("name")}
-                    >
-                      <Text
-                        style={[
-                          themed(styles.$filterOptionText),
-                          tempSortBy === "name" && themed(styles.$filterOptionTextSelected),
-                        ]}
-                      >
-                        Name
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        themed(styles.$filterOption),
-                        tempSortBy === "price" && themed(styles.$filterOptionSelected),
-                      ]}
-                      onPress={() => setTempSortBy("price")}
-                    >
-                      <Text
-                        style={[
-                          themed(styles.$filterOptionText),
-                          tempSortBy === "price" && themed(styles.$filterOptionTextSelected),
-                        ]}
-                      >
-                        Price
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        themed(styles.$filterOption),
-                        tempSortBy === "category" && themed(styles.$filterOptionSelected),
-                      ]}
-                      onPress={() => setTempSortBy("category")}
-                    >
-                      <Text
-                        style={[
-                          themed(styles.$filterOptionText),
-                          tempSortBy === "category" && themed(styles.$filterOptionTextSelected),
-                        ]}
-                      >
-                        Category
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={themed(styles.$filterSection)}>
-                  <Text style={themed(styles.$filterSectionTitle)}>Sort Order</Text>
-                  <View style={themed(styles.$filterOptions)}>
-                    <TouchableOpacity
-                      style={[
-                        themed(styles.$filterOption),
-                        tempSortOrder === "asc" && themed(styles.$filterOptionSelected),
-                      ]}
-                      onPress={() => setTempSortOrder("asc")}
-                    >
-                      <Text
-                        style={[
-                          themed(styles.$filterOptionText),
-                          tempSortOrder === "asc" && themed(styles.$filterOptionTextSelected),
-                        ]}
-                      >
-                        Ascending
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        themed(styles.$filterOption),
-                        tempSortOrder === "desc" && themed(styles.$filterOptionSelected),
-                      ]}
-                      onPress={() => setTempSortOrder("desc")}
-                    >
-                      <Text
-                        style={[
-                          themed(styles.$filterOptionText),
-                          tempSortOrder === "desc" && themed(styles.$filterOptionTextSelected),
-                        ]}
-                      >
-                        Descending
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={themed(styles.$filterActions)}>
-                  <TouchableOpacity style={themed(styles.$resetButton)} onPress={resetFilters}>
-                    <Text style={themed(styles.$resetButtonText)}>Reset</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity style={themed(styles.$applyButton)} onPress={applyFilters}>
-                    <Text style={themed(styles.$applyButtonText)}>Apply</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+                </ScrollView>
+              </KeyboardAvoidingView>
             </TouchableWithoutFeedback>
           </View>
         </TouchableWithoutFeedback>
@@ -378,7 +379,6 @@ export default function Product() {
             </TouchableOpacity>
           </View>
         </View>
-
         <View style={themed(styles.$searchContainer)}>
           <View style={themed(styles.$searchBar)}>
             <FontAwesome name="search" size={16} color={theme.colors.palette.neutral500} />
@@ -400,7 +400,6 @@ export default function Product() {
             )}
           </View>
         </View>
-
         {(selectedCategory !== "All" || sortBy !== "name" || sortOrder !== "asc") && (
           <View style={themed(styles.$filterIndicators)}>
             {selectedCategory !== "All" && (
@@ -418,8 +417,8 @@ export default function Product() {
             {(sortBy !== "name" || sortOrder !== "asc") && (
               <View style={themed(styles.$filterTag)}>
                 <Text style={themed(styles.$filterTagText)}>
-                  Sort: {sortBy === "name" ? "Name" : sortBy === "price" ? "Price" : "Category"}{" "}
-                  ({sortOrder === "asc" ? "↑" : "↓"})
+                  Sort: {sortBy === "name" ? "Name" : sortBy === "price" ? "Price" : "Category"} (
+                  {sortOrder === "asc" ? "↑" : "↓"})
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
@@ -433,7 +432,8 @@ export default function Product() {
               </View>
             )}
           </View>
-        )}        {isLoading ? (
+        )}{" "}
+        {isLoading ? (
           <View style={themed(styles.$loadingContainer)}>
             <ActivityIndicator size="large" color={theme.colors.palette.primary500} />
             <Text style={themed(styles.$loadingText)}>
@@ -444,7 +444,7 @@ export default function Product() {
           <FlatList
             data={filteredProducts}
             renderItem={renderItem}
-            keyExtractor={(item) => item.productId}
+            keyExtractor={(item, index) => item.id ?? index.toString()}
             contentContainerStyle={themed(styles.$listContent)}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={renderEmptyList}
@@ -458,7 +458,6 @@ export default function Product() {
             }
           />
         )}
-
         {renderFilterModal()}
       </Screen>
     </KeyboardAvoidingView>

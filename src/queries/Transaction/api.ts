@@ -1,57 +1,69 @@
-/* eslint-disable prettier/prettier */
-import { transactionAPI } from '@/services/http'
-import { TransactionResponse } from './types'
-
-export const API_BASE_URL = 'https://671f1b7a1dfc42991983f6dc.mockapi.io/api/v1'
+import { TransactionResponse } from "./types"
+import { warehouseAPI } from "@/services/http"
 
 export const fetchTransactions = async (): Promise<TransactionResponse[]> => {
   try {
-    const response = await transactionAPI.get('/imports')
-    return response.data
+    console.log(
+      "Making get list Transactions request to:",
+      warehouseAPI.defaults.baseURL + "/transactions/all",
+    )
+    console.log("Using base URL:", warehouseAPI.defaults.baseURL)
+    console.log("Fetching all transactions...")
+
+    const response = await warehouseAPI.get("/transactions/all")
+
+    if (response.status !== 200) {
+      throw new Error("Failed to fetch transactions")
+    }
+
+    const transactions = response.data?.transactions
+
+    if (!transactions || !Array.isArray(transactions)) {
+      throw new Error("Invalid response data format: `transactions` not found or not an array")
+    }
+
+    if (transactions.length === 0) {
+      console.warn("No transactions found")
+    } else {
+      console.log(`Found ${transactions.length} transactions`)
+    }
+
+    console.log("Transactions data:", transactions)
+    console.log("Get list Transactions successful:", response.status)
+
+    return transactions
   } catch (error) {
-    console.error('Error fetching transactions:', error)
+    console.error("Error fetching list transactions:", error)
     throw error
   }
 }
-
 
 export const fetchTransactionById = async (id: string): Promise<TransactionResponse> => {
   try {
-    const response = await transactionAPI.get(`/imports/${id}`)
-    return response.data
+    console.log(`Fetching transaction with ID: ${id}`)
+    console.log("Using base URL:", warehouseAPI.defaults.baseURL)
+
+    const response = await warehouseAPI.get(`/transactions/${id}`)
+
+    if (response.status !== 200) {
+      throw new Error(`Failed to fetch transaction with ID ${id}. Status: ${response.status}`)
+    }
+
+    const transaction = response.data
+
+    if (!transaction || typeof transaction !== "object") {
+      throw new Error(`Invalid transaction data received for ID ${id}`)
+    }
+
+    if (!transaction.id || transaction.id !== id) {
+      throw new Error(`Transaction ID mismatch or missing: expected ${id}, got ${transaction.id}`)
+    }
+
+    console.log(`Transaction data successfully fetched and validated:`, transaction)
+
+    return transaction
   } catch (error) {
     console.error(`Error fetching transaction with ID ${id}:`, error)
-    throw error
-  }
-}
-
-export const createTransaction = async (data: Partial<TransactionResponse>): Promise<TransactionResponse> => {
-  try {
-    const response = await transactionAPI.post('/imports', data)
-    return response.data
-  } catch (error) {
-    console.error('Error creating transaction:', error)
-    throw error
-  }
-}
-
-
-export const updateTransaction = async (id: string, data: Partial<TransactionResponse>): Promise<TransactionResponse> => {
-  try {
-    const response = await transactionAPI.put(`/imports/${id}`, data)
-    return response.data
-  } catch (error) {
-    console.error(`Error updating transaction with ID ${id}:`, error)
-    throw error
-  }
-}
-
-export const deleteTransaction = async (id: string): Promise<any> => {
-  try {
-    const response = await transactionAPI.delete(`/imports/${id}`)
-    return response.data
-  } catch (error) {
-    console.error(`Error deleting transaction with ID ${id}:`, error)
     throw error
   }
 }

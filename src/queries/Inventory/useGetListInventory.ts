@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
 import { InventoryResponse } from './types'
 import { fetchInventory } from './api'
@@ -10,12 +9,12 @@ export function useGetListInventory(options?: UseQueryOptions<InventoryResponse[
     isFetching,
     refetch: onGetAllListinventory
   } = useQuery({
-    queryKey: ['inventory'],
+    queryKey: ['inventories'],
     queryFn: fetchInventory,
     ...options
   })
   const queryClient = useQueryClient()
 
-  const handleInvalidateListInventory = () => queryClient.invalidateQueries({ queryKey: ['inventory'] })
+  const handleInvalidateListInventory = () => queryClient.invalidateQueries({ queryKey: ['inventories'] })
   return { data, error, isFetching, onGetAllListinventory, handleInvalidateListInventory }
 }

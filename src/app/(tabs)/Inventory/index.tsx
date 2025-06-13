@@ -1,9 +1,4 @@
-/* eslint-disable prettier/prettier */
-
 import { Screen, Text } from "@/components"
-import { locationNames, productNames } from "@/queries/Inventory/mockData"
-import { InventoryResponse } from "@/queries/Inventory/types"
-import { useGetListInventory } from "@/queries/Inventory/useGetListInventory"
 import { useAppTheme } from "@/utils/useAppTheme"
 import { FontAwesome } from "@expo/vector-icons"
 import { useEffect, useState } from "react"
@@ -19,11 +14,12 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  ScrollView,
 } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import styles from "./styles"
-
-const locations = ["All", ...Object.keys(locationNames).map((id) => locationNames[id])]
+import { InventoryResponse } from "@/queries/Inventory/types"
+import { useGetListInventory } from "@/queries/Inventory/useGetListInventory"
 
 export default function Inventory() {
   const { themed, theme } = useAppTheme()
@@ -32,49 +28,45 @@ export default function Inventory() {
   const [inventory, setInventory] = useState<InventoryResponse[]>([])
   const [filteredInventory, setFilteredInventory] = useState<InventoryResponse[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedLocation, setSelectedLocation] = useState("All")
   const [isLoading, setIsLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const [sortBy, setSortBy] = useState<keyof InventoryResponse>("product_id")
+  const [sortBy, setSortBy] = useState<string>("lastUpdated")
   const [filterModalVisible, setFilterModalVisible] = useState(false)
 
-  const [tempLocation, setTempLocation] = useState("All")
-  const [tempSortBy, setTempSortBy] = useState<keyof InventoryResponse>("product_id")
+  const [tempSortBy, setTempSortBy] = useState<string>("lastUpdated")
   const [tempSortOrder, setTempSortOrder] = useState<"asc" | "desc">("asc")
 
+  const { data: inventoriesData, error: inventoriesError } = useGetListInventory()
+
   const openFilterModal = () => {
-    setTempLocation(selectedLocation)
     setTempSortBy(sortBy)
     setTempSortOrder(sortOrder)
     setFilterModalVisible(true)
   }
 
   const applyFilters = () => {
-    setSelectedLocation(tempLocation)
     setSortBy(tempSortBy)
     setSortOrder(tempSortOrder)
     setFilterModalVisible(false)
   }
 
   const resetFilters = () => {
-    setTempLocation("All")
-    setTempSortBy("product_id")
+    setTempSortBy("lastUpdated")
     setTempSortOrder("asc")
   }
-  // Status functionality removed
-  const { data: inventoryData, error: inventoryError } = useGetListInventory()
-  
+
   useEffect(() => {
     const fetchInventory = async () => {
       setIsLoading(true)
       try {
-        if (inventoryError) {
-          throw inventoryError
+        if (inventoriesError) {
+          throw inventoriesError
         }
-        
-        if (inventoryData) {
-          setInventory(inventoryData)
+
+        if (inventoriesData) {
+          setInventory(inventoriesData)
         }
       } catch (error) {
         console.error("Error fetching inventory:", error)
@@ -85,118 +77,148 @@ export default function Inventory() {
     }
 
     fetchInventory()
-  }, [inventoryData, inventoryError])
+  }, [inventoriesData, inventoriesError])
 
   useEffect(() => {
     let filtered = [...inventory]
 
-    if (selectedLocation !== "All") {
-      const locationId = Object.entries(locationNames).find(
-        ([_, name]) => name === selectedLocation,
-      )?.[0]
-
-      if (locationId) {
-        filtered = filtered.filter((item) => item.location_id === locationId)
-      }
-    }
-
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter((item) => {
-        const productName = productNames[item.product_id]?.toLowerCase() || ""
-        const batchNumber = item.batch_number.toLowerCase()
-        return (
-          productName.includes(query) ||
-          batchNumber.includes(query) ||
-          item.product_id.toLowerCase().includes(query)
-        )
+        const productName = item.product.name.toLowerCase()
+        const locationCode = item.locationCode.toLowerCase()
+        return productName.includes(query) || locationCode.includes(query)
       })
     }
 
+    const keyMap: Record<string, keyof InventoryResponse> = {
+      id: "id",
+      batchNumber: "batchNumber",
+      createdAt: "createdAt",
+      expiryDate: "expiryDate",
+      lastCountedDate: "lastCountedDate",
+      lastUpdated: "lastUpdated",
+      locationCode: "locationCode",
+      maxStockLevel: "maxStockLevel",
+      quantityOnHand: "quantityOnHand",
+      reorderLevel: "reorderLevel",
+      reservedQuantity: "reservedQuantity",
+      unitCost: "unitCost",
+      updatedBy: "updatedBy",
+    }
+
     filtered.sort((a, b) => {
-      let valueA: any = a[sortBy]
-      let valueB: any = b[sortBy]
+      const mappedKey = keyMap[sortBy] ?? sortBy
+      let valueA: any = a[mappedKey]
+      let valueB: any = b[mappedKey]
 
-      if (sortBy === "product_id") {
-        valueA = productNames[a.product_id] || a.product_id
-        valueB = productNames[b.product_id] || b.product_id
+      if (mappedKey === "lastUpdated" || mappedKey === "expiryDate") {
+        valueA = new Date(valueA).getTime()
+        valueB = new Date(valueB).getTime()
       }
-
-      if (sortBy === "location_id") {
-        valueA = locationNames[a.location_id] || a.location_id
-        valueB = locationNames[b.location_id] || b.location_id
-      }
-
       if (typeof valueA === "string" && typeof valueB === "string") {
         valueA = valueA.toLowerCase()
         valueB = valueB.toLowerCase()
         return sortOrder === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA)
       }
 
-      return sortOrder === "asc"
-        ? (valueA as number) - (valueB as number)
-        : (valueB as number) - (valueA as number)
+      return sortOrder === "asc" ? Number(valueA) - Number(valueB) : Number(valueB) - Number(valueA)
     })
 
     setFilteredInventory(filtered)
-  }, [inventory, searchQuery, selectedLocation, sortOrder, sortBy])
+  }, [inventory, searchQuery, sortOrder, sortBy])
 
   const onRefresh = async () => {
     setRefreshing(true)
-
+    setIsLoading(true)
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      if (inventoryData) {
-        setInventory(inventoryData)
+      if (inventoriesData) {
+        setInventory(inventoriesData)
       }
     } catch (error) {
       console.error("Error refreshing inventory:", error)
       Alert.alert("Error", "Failed to refresh inventory data")
     } finally {
-      setRefreshing(false)
+      setTimeout(() => {
+        setRefreshing(false)
+        setIsLoading(false)
+      }, 800)
     }
   }
-  const formatDate = (dateString: string) => {
+
+  const formatPrice = (price: number) => {
+    return `${price.toLocaleString("vi-VN")} VND`
+  }
+
+  const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
     return date.toLocaleDateString()
   }
 
   const renderItem = ({ item }: { item: InventoryResponse }) => {
-    const productName = productNames[item.product_name] || item.product_name
-    const locationName = locationNames[item.location_id] || item.location_id
-
     return (
       <TouchableOpacity
         style={themed(styles.$itemContainer)}
         onPress={() =>
           Alert.alert(
-            productName,
-            `Inventory ID: ${item.inventory_id}\nProduct ID: ${item.product_id}\nLocation: ${locationName}\nQuantity: ${item.quantity}\nBatch: ${item.batch_number}\nImported: ${formatDate(item.import_date)}\nExpiry: ${formatDate(item.expiry_date)}`,
+            "Details for " + item.product.name,
+            `Warehouse Name: ${item.warehouse.name}
+            \nLocation Code: ${item.locationCode}
+            \nQuantity on Hand: ${item.quantityOnHand}
+            \nBatch Number: ${item.batchNumber}
+            \nMax Stock Level: ${item.maxStockLevel}
+            \nReorder Level: ${item.reorderLevel}
+            \nReserved Quantity: ${item.reservedQuantity}
+            \nUnit Cost: ${formatPrice(item.unitCost)}
+            \nCreated At: ${formatDate(item.product.createdAt)}
+            \nLast Updated: ${formatDate(item.lastUpdated)}
+            \nExpiry Date: ${formatDate(item.expiryDate)}
+            \nProduct description: ${item.product.description}`,
           )
         }
       >
         <View style={themed(styles.$itemContent)}>
           <View style={themed(styles.$itemHeader)}>
-            <Text style={themed(styles.$itemName)}>{productName}</Text>
+            <Text style={themed(styles.$itemName)} numberOfLines={1} ellipsizeMode="tail">
+              {item.product.name}
+            </Text>
           </View>
 
           <View style={themed(styles.$itemDetails)}>
-            <Text style={themed(styles.$itemId)}>ID: {item.product_id}</Text>
-            <Text style={themed(styles.$itemQuantity)}>Qty: {item.quantity}</Text>
+            <Text style={themed(styles.$itemId)} numberOfLines={1} ellipsizeMode="tail">
+              Warehouse Name: {item.warehouse.name}
+            </Text>
           </View>
 
           <View style={themed(styles.$itemDetails)}>
             <Text style={themed(styles.$itemLocation)} numberOfLines={1} ellipsizeMode="tail">
-          Location: {locationName}
+              Location: {item.locationCode}
             </Text>
-            <Text style={themed(styles.$itemBatch)}>Batch: {item.batch_number}</Text>
+          </View>
+
+          <View style={themed(styles.$itemDetails)}>
+            <Text style={themed(styles.$itemBatch)}>Reorder Level: {item.reorderLevel}</Text>
+            <Text style={themed(styles.$itemBatch)}>Max Stock Level: {item.maxStockLevel}</Text>
+          </View>
+
+          <View style={themed(styles.$itemDetails)}>
+            <Text style={themed(styles.$itemBatch)}>Unit Cost: {formatPrice(item.unitCost)}</Text>
+          </View>
+
+          <View style={themed(styles.$itemDetails)}>
+            <Text style={themed(styles.$itemBatch)}>Quantity: {item.quantityOnHand} </Text>
+            <Text style={themed(styles.$itemDate)}>
+              Last Updated: {formatDate(item.lastUpdated)}
+            </Text>
+            <Text style={themed(styles.$itemDate)}></Text>
           </View>
 
           <View style={themed(styles.$itemFooter)}>
-            <Text style={themed(styles.$itemDate)}>Import: {formatDate(item.import_date)}</Text>
             <Text style={themed(styles.$itemDate)}>
-              Expiry: {formatDate(item.expiry_date)}
+              Created: {formatDate(item.product.createdAt)}
             </Text>
+            <Text style={themed(styles.$itemDate)}>Expiry Date: {formatDate(item.expiryDate)}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -210,9 +232,7 @@ export default function Inventory() {
       <View style={themed(styles.$emptyContainer)}>
         <FontAwesome name="inbox" size={50} color={theme.colors.palette.neutral400} />
         <Text style={themed(styles.$emptyText)}>
-          {searchQuery || selectedLocation !== "All"
-            ? "No matching inventory items found"
-            : "No inventory items available"}
+          {searchQuery ? "No matching inventory items found" : "No inventory items available"}
         </Text>
         <TouchableOpacity style={themed(styles.$emptyButton)} onPress={onRefresh}>
           <Text style={themed(styles.$emptyButtonText)}>Refresh</Text>
@@ -232,144 +252,111 @@ export default function Inventory() {
         <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)}>
           <View style={themed(styles.$modalOverlay)}>
             <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-              <View style={themed(styles.$filterModalContainer)}>
-                <View style={themed(styles.$filterModalHeader)}>
-                  <Text style={themed(styles.$filterModalTitle)}>Filter Inventory</Text>
-                  <TouchableOpacity onPress={() => setFilterModalVisible(false)}>
-                    <FontAwesome name="times" size={24} color={theme.colors.text} />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={themed(styles.$filterSection)}>
-                  <Text style={themed(styles.$filterSectionTitle)}>Location</Text>
-                  <View style={themed(styles.$filterOptions)}>
-                    {locations.map((location) => (
-                      <TouchableOpacity
-                        key={location}
-                        style={[
-                          themed(styles.$filterOption),
-                          tempLocation === location && themed(styles.$filterOptionSelected),
-                        ]}
-                        onPress={() => setTempLocation(location)}
-                      >
-                        <Text
-                          style={[
-                            themed(styles.$filterOptionText),
-                            tempLocation === location && themed(styles.$filterOptionTextSelected),
-                          ]}
-                        >
-                          {location}
-                        </Text>
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                style={themed(styles.$filterModalContainer)}
+              >
+                <ScrollView showsVerticalScrollIndicator={true}>
+                  <View style={themed(styles.$filterModalContainer)}>
+                    <View style={themed(styles.$filterModalHeader)}>
+                      <Text style={themed(styles.$filterModalTitle)}>Filter Inventory</Text>
+                      <TouchableOpacity onPress={() => setFilterModalVisible(false)}>
+                        <FontAwesome name="times" size={24} color={theme.colors.text} />
                       </TouchableOpacity>
-                    ))}
+                    </View>
+
+                    <View style={themed(styles.$filterSection)}>
+                      <Text style={themed(styles.$filterSectionTitle)}>Sort By</Text>
+                      <View style={themed(styles.$filterOptions)}>
+                        <TouchableOpacity
+                          style={[
+                            themed(styles.$filterOption),
+                            tempSortBy === "lastUpdated" && themed(styles.$filterOptionSelected),
+                          ]}
+                          onPress={() => setTempSortBy("lastUpdated")}
+                        >
+                          <Text
+                            style={[
+                              themed(styles.$filterOptionText),
+                              tempSortBy === "lastUpdated" &&
+                                themed(styles.$filterOptionTextSelected),
+                            ]}
+                          >
+                            Last Updated
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={[
+                            themed(styles.$filterOption),
+                            tempSortBy === "expiryDate" && themed(styles.$filterOptionSelected),
+                          ]}
+                          onPress={() => setTempSortBy("expiryDate")}
+                        >
+                          <Text
+                            style={[
+                              themed(styles.$filterOptionText),
+                              tempSortBy === "expiryDate" &&
+                                themed(styles.$filterOptionTextSelected),
+                            ]}
+                          >
+                            Expiry Date
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    <View style={themed(styles.$filterSection)}>
+                      <Text style={themed(styles.$filterSectionTitle)}>Sort Order</Text>
+                      <View style={themed(styles.$filterOptions)}>
+                        <TouchableOpacity
+                          style={[
+                            themed(styles.$filterOption),
+                            tempSortOrder === "asc" && themed(styles.$filterOptionSelected),
+                          ]}
+                          onPress={() => setTempSortOrder("asc")}
+                        >
+                          <Text
+                            style={[
+                              themed(styles.$filterOptionText),
+                              tempSortOrder === "asc" && themed(styles.$filterOptionTextSelected),
+                            ]}
+                          >
+                            Ascending
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={[
+                            themed(styles.$filterOption),
+                            tempSortOrder === "desc" && themed(styles.$filterOptionSelected),
+                          ]}
+                          onPress={() => setTempSortOrder("desc")}
+                        >
+                          <Text
+                            style={[
+                              themed(styles.$filterOptionText),
+                              tempSortOrder === "desc" && themed(styles.$filterOptionTextSelected),
+                            ]}
+                          >
+                            Descending
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    <View style={themed(styles.$filterActions)}>
+                      <TouchableOpacity style={themed(styles.$resetButton)} onPress={resetFilters}>
+                        <Text style={themed(styles.$resetButtonText)}>Reset</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity style={themed(styles.$applyButton)} onPress={applyFilters}>
+                        <Text style={themed(styles.$applyButtonText)}>Apply</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-
-                <View style={themed(styles.$filterSection)}>
-                  <Text style={themed(styles.$filterSectionTitle)}>Sort By</Text>
-                  <View style={themed(styles.$filterOptions)}>
-                    <TouchableOpacity
-                      style={[
-                        themed(styles.$filterOption),
-                        tempSortBy === "product_id" && themed(styles.$filterOptionSelected),
-                      ]}
-                      onPress={() => setTempSortBy("product_id")}
-                    >
-                      <Text
-                        style={[
-                          themed(styles.$filterOptionText),
-                          tempSortBy === "product_id" && themed(styles.$filterOptionTextSelected),
-                        ]}
-                      >
-                        Product
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        themed(styles.$filterOption),
-                        tempSortBy === "quantity" && themed(styles.$filterOptionSelected),
-                      ]}
-                      onPress={() => setTempSortBy("quantity")}
-                    >
-                      <Text
-                        style={[
-                          themed(styles.$filterOptionText),
-                          tempSortBy === "quantity" && themed(styles.$filterOptionTextSelected),
-                        ]}
-                      >
-                        Quantity
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        themed(styles.$filterOption),
-                        tempSortBy === "expiry_date" && themed(styles.$filterOptionSelected),
-                      ]}
-                      onPress={() => setTempSortBy("expiry_date")}
-                    >
-                      <Text
-                        style={[
-                          themed(styles.$filterOptionText),
-                          tempSortBy === "expiry_date" && themed(styles.$filterOptionTextSelected),
-                        ]}
-                      >
-                        Expiry Date
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={themed(styles.$filterSection)}>
-                  <Text style={themed(styles.$filterSectionTitle)}>Sort Order</Text>
-                  <View style={themed(styles.$filterOptions)}>
-                    <TouchableOpacity
-                      style={[
-                        themed(styles.$filterOption),
-                        tempSortOrder === "asc" && themed(styles.$filterOptionSelected),
-                      ]}
-                      onPress={() => setTempSortOrder("asc")}
-                    >
-                      <Text
-                        style={[
-                          themed(styles.$filterOptionText),
-                          tempSortOrder === "asc" && themed(styles.$filterOptionTextSelected),
-                        ]}
-                      >
-                        Ascending
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        themed(styles.$filterOption),
-                        tempSortOrder === "desc" && themed(styles.$filterOptionSelected),
-                      ]}
-                      onPress={() => setTempSortOrder("desc")}
-                    >
-                      <Text
-                        style={[
-                          themed(styles.$filterOptionText),
-                          tempSortOrder === "desc" && themed(styles.$filterOptionTextSelected),
-                        ]}
-                      >
-                        Descending
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={themed(styles.$filterActions)}>
-                  <TouchableOpacity style={themed(styles.$resetButton)} onPress={resetFilters}>
-                    <Text style={themed(styles.$resetButtonText)}>Reset</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity style={themed(styles.$applyButton)} onPress={applyFilters}>
-                    <Text style={themed(styles.$applyButtonText)}>Apply</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+                </ScrollView>
+              </KeyboardAvoidingView>
             </TouchableWithoutFeedback>
           </View>
         </TouchableWithoutFeedback>
@@ -392,8 +379,6 @@ export default function Inventory() {
             <TouchableOpacity style={themed(styles.$filterButton)} onPress={openFilterModal}>
               <FontAwesome name="filter" size={18} color={theme.colors.palette.neutral100} />
             </TouchableOpacity>
-
-            
           </View>
         </View>
 
@@ -402,7 +387,7 @@ export default function Inventory() {
             <FontAwesome name="search" size={16} color={theme.colors.palette.neutral500} />
             <TextInput
               style={themed(styles.$searchInput)}
-              placeholder="Search product, batch..."
+              placeholder="Search product name, location..."
               placeholderTextColor={theme.colors.palette.neutral500}
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -419,34 +404,22 @@ export default function Inventory() {
           </View>
         </View>
 
-        {(selectedLocation !== "All" || sortBy !== "product_id" || sortOrder !== "asc") && (
+        {(sortBy !== "lastUpdated" || sortOrder !== "asc") && (
           <View style={themed(styles.$filterIndicators)}>
-            {selectedLocation !== "All" && (
-              <View style={themed(styles.$filterTag)}>
-                <Text style={themed(styles.$filterTagText)}>Location: {selectedLocation}</Text>
-                <TouchableOpacity
-                  onPress={() => setSelectedLocation("All")}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <FontAwesome name="times" size={12} color={theme.colors.text} />
-                </TouchableOpacity>
-              </View>
-            )}
-
-            {(sortBy !== "product_id" || sortOrder !== "asc") && (
+            {(sortBy !== "lastUpdated" || sortOrder !== "asc") && (
               <View style={themed(styles.$filterTag)}>
                 <Text style={themed(styles.$filterTagText)}>
                   Sort:{" "}
-                  {sortBy === "product_id"
-                    ? "Product"
-                    : sortBy === "quantity"
-                      ? "Quantity"
-                      : "Expiry"}{" "}
+                  {sortBy === "lastUpdated"
+                    ? "Last Updated"
+                    : sortBy === "expiryDate"
+                      ? "Expiry Date"
+                      : sortBy}{" "}
                   ({sortOrder === "asc" ? "↑" : "↓"})
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    setSortBy("product_id")
+                    setSortBy("lastUpdated")
                     setSortOrder("asc")
                   }}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -467,7 +440,7 @@ export default function Inventory() {
           <FlatList
             data={filteredInventory}
             renderItem={renderItem}
-            keyExtractor={(item) => item.inventory_id}
+            keyExtractor={(item) => item.id}
             contentContainerStyle={themed(styles.$listContent)}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={renderEmptyList}

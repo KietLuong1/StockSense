@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 interface ImportMetaEnv {
     readonly VITE_LOCAL_API_URL: string
     readonly VITE_TRANSACTION_LOCATION_API_URL: string

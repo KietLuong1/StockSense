@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { ThemedStyle } from "@/theme"
 import { TextStyle, ViewStyle } from "react-native"
 

@@ -1,143 +1,148 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import axios from "axios"
 import { Platform } from "react-native"
 import * as SecureStore from "expo-secure-store"
-import * as Device from 'expo-device'
-import Constants from 'expo-constants'
-import { API_BASE_URL } from "@/queries/Transaction/api"
-import { API_INVENTORY_URL } from "@/queries/Inventory/api"
-import { API_PRODUCT_URL } from "@/queries/Products/api"
-import { API_SUPPLIER_URL } from "@/queries/Supplier/api"
-import { API_LOCATION_URL } from "@/queries/Location/api"
+import * as Device from "expo-device"
+import Constants from "expo-constants"
+import axios, { AxiosInstance } from "axios"
+// import Config from "../../config/config.dev"
 
-const API_PORT = "8080"
+const API_LOGINSERVICE_PORT = "8080"
+const API_WAREHOUSE_PORT = "8081"
 const API_PATH = "/api/v1"
 const FALLBACK_IP = "192.168.100.144"
 
-export const getBaseUrl = () => {
-  let localIp = FALLBACK_IP; 
-  
+export const getLoginServiceUrl = () => {
+  let localIp = FALLBACK_IP
+
   try {
     if (Constants.expoConfig?.hostUri) {
-      const hostUriParts = Constants.expoConfig.hostUri.split(':');
+      const hostUriParts = Constants.expoConfig.hostUri.split(":")
       if (hostUriParts.length > 0) {
-        localIp = hostUriParts[0];
+        localIp = hostUriParts[0]
       }
     }
   } catch (error) {
-    console.log("Error getting Expo host:", error);
+    console.log("Error getting Expo host:", error)
   }
-  console.log("===== API CONNECTION INFO =====");
-  console.log("Platform:", Platform.OS);
-  console.log("Physical device:", Device.isDevice);
-  console.log("Local IP:", localIp);
-  
-  let baseUrl;
-  
-  if (Platform.OS === 'android') {
-    baseUrl = Device.isDevice 
-      ? `http://${localIp}:${API_PORT}${API_PATH}` 
-      : `http://10.0.2.2:${API_PORT}${API_PATH}`;
-    console.log("Using Android URL:", baseUrl);
+  console.log("===== API CONNECTION INFO =====")
+  console.log("Platform:", Platform.OS)
+  console.log("Physical device:", Device.isDevice)
+  console.log("Local IP:", localIp)
+
+  let baseUrl
+
+  if (Platform.OS === "android") {
+    baseUrl = Device.isDevice
+      ? `http://${localIp}:${API_LOGINSERVICE_PORT}${API_PATH}`
+      : `http://10.0.2.2:${API_LOGINSERVICE_PORT}${API_PATH}`
+    console.log("Using Android URL:", baseUrl)
+  } else {
+    baseUrl = `http://localhost:${API_LOGINSERVICE_PORT}${API_PATH}`
+    console.log("Using default URL:", baseUrl)
   }
 
-  else {
-    baseUrl = `http://localhost:${API_PORT}${API_PATH}`;
-    console.log("Using default URL:", baseUrl);
-  }
-  
-  console.log("Final API URL:", baseUrl);
-  console.log("=============================");
-  return baseUrl;
+  console.log("Final API URL:", baseUrl)
+  console.log("=============================")
+  return baseUrl
 }
 
 export const getToken = async () => {
   try {
     try {
-      if (SecureStore && typeof SecureStore.isAvailableAsync === 'function' && await SecureStore.isAvailableAsync()) {
+      if (
+        SecureStore &&
+        typeof SecureStore.isAvailableAsync === "function" &&
+        (await SecureStore.isAvailableAsync())
+      ) {
         return await SecureStore.getItemAsync("accessToken")
       }
     } catch (secureError) {
       console.log("SecureStore not available, falling back to AsyncStorage")
     }
-    
+
     return await AsyncStorage.getItem("accessToken")
   } catch (e) {
     console.error("Error retrieving token:", e)
     return null
   }
 }
+
 export const refreshToken = async () => {
   try {
-    let refreshToken;
-    
+    let refreshToken
+
     try {
-      if (SecureStore && typeof SecureStore.isAvailableAsync === 'function' && 
-          await SecureStore.isAvailableAsync()) {
-        refreshToken = await SecureStore.getItemAsync("refreshToken");
+      if (
+        SecureStore &&
+        typeof SecureStore.isAvailableAsync === "function" &&
+        (await SecureStore.isAvailableAsync())
+      ) {
+        refreshToken = await SecureStore.getItemAsync("refreshToken")
       }
     } catch (secureError) {
-      console.log("SecureStore not available for refresh token, trying AsyncStorage");
+      console.log("SecureStore not available for refresh token, trying AsyncStorage")
     }
-    
+
     if (!refreshToken) {
-      refreshToken = await AsyncStorage.getItem("refreshToken");
+      refreshToken = await AsyncStorage.getItem("refreshToken")
     }
-    
+
     if (!refreshToken) {
-      console.error("No refresh token available");
-      return null;
+      console.error("No refresh token available")
+      return null
     }
-    
-    console.log("Attempting to refresh token");
-    const response = await axios.post(`${getBaseUrl()}/auth/refresh`, {
-      refreshToken
-    });
-    
-    console.log("Refresh response status:", response.status);
-    console.log("Refresh response data:", JSON.stringify(response.data, null, 2));
-    
+
+    console.log("Attempting to refresh token")
+    const response = await axios.post(`${getLoginServiceUrl()}/auth/refresh`, {
+      refreshToken,
+    })
+
+    console.log("Refresh response status:", response.status)
+    console.log("Refresh response data:", JSON.stringify(response.data, null, 2))
+
     // Check for different possible response structures
-    const newToken = response.data?.accessToken || 
-                     response.data?.token || 
-                     (typeof response.data === 'string' ? response.data : null);
-    
+    const newToken =
+      response.data?.accessToken ||
+      response.data?.token ||
+      (typeof response.data === "string" ? response.data : null)
+
     if (newToken) {
-      console.log("Successfully obtained new access token");
-      
+      console.log("Successfully obtained new access token")
+
       try {
-        if (SecureStore && typeof SecureStore.isAvailableAsync === 'function' && 
-            await SecureStore.isAvailableAsync()) {
-          await SecureStore.setItemAsync("accessToken", newToken);
+        if (
+          SecureStore &&
+          typeof SecureStore.isAvailableAsync === "function" &&
+          (await SecureStore.isAvailableAsync())
+        ) {
+          await SecureStore.setItemAsync("accessToken", newToken)
         } else {
-          await AsyncStorage.setItem("accessToken", newToken);
+          await AsyncStorage.setItem("accessToken", newToken)
         }
-        
-        return newToken;
+
+        return newToken
       } catch (storageError) {
-        console.error("Error saving refreshed token:", storageError);
+        console.error("Error saving refreshed token:", storageError)
       }
     } else {
-      console.error("Refresh response did not contain a new token");
+      console.error("Refresh response did not contain a new token")
     }
-    
-    return null;
+
+    return null
   } catch (error) {
-    console.error("Token refresh failed with error:");
+    console.error("Token refresh failed with error:")
     if (axios.isAxiosError(error)) {
-      console.error("Status:", error.response?.status);
-      console.error("Data:", JSON.stringify(error.response?.data, null, 2));
+      console.error("Status:", error.response?.status)
+      console.error("Data:", JSON.stringify(error.response?.data, null, 2))
     } else {
-      console.error(error);
+      console.error(error)
     }
-    return null;
+    return null
   }
 }
 
 export const axiosAccount = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: getLoginServiceUrl(),
   headers: {
     "Content-Type": "application/json",
     "Accept": "application/json",
@@ -145,105 +150,183 @@ export const axiosAccount = axios.create({
     "Access-Control-Allow-Origin": "*",
   },
   timeout: 30000,
-  withCredentials: true
+  withCredentials: true,
 })
 
 axiosAccount.interceptors.request.use(
   async (config) => {
-    console.log(`Request: ${config.method?.toUpperCase()} ${config.url}`);
-    
+    console.log(`Request: ${config.method?.toUpperCase()} ${config.url}`)
+
     const token = await getToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-      console.log("Using authorization token");
+      console.log("Using authorization token")
     }
-    
+
     return config
   },
   (error) => {
-    console.error("Request error:", error);
+    console.error("Request error:", error)
     return Promise.reject(error)
-  }
+  },
 )
 
 axiosAccount.interceptors.response.use(
-  response => response,
-  async error => {
-    const originalRequest = error.config;
-  
-    if ((error.response?.status === 403 || error.response?.status === 401) && 
-        !originalRequest._retry) {
-      
-      console.log("Authentication error detected, attempting to refresh token");
-      originalRequest._retry = true;
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config
+
+    if (
+      (error.response?.status === 403 || error.response?.status === 401) &&
+      !originalRequest._retry
+    ) {
+      console.log("Authentication error detected, attempting to refresh token")
+      originalRequest._retry = true
 
       try {
-        const newToken = await refreshToken();
-        
+        const newToken = await refreshToken()
+
         if (newToken) {
-          console.log("Token refresh successful, retrying request");
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          return axiosAccount(originalRequest);
+          console.log("Token refresh successful, retrying request")
+          originalRequest.headers.Authorization = `Bearer ${newToken}`
+          return axiosAccount(originalRequest)
         } else {
-          console.log("Token refresh failed, user needs to re-authenticate");
-          await AsyncStorage.removeItem("accessToken");
-          await AsyncStorage.removeItem("refreshToken");
-          
-          if (SecureStore && typeof SecureStore.isAvailableAsync === 'function' && 
-              await SecureStore.isAvailableAsync()) {
-            await SecureStore.deleteItemAsync("accessToken");
-            await SecureStore.deleteItemAsync("refreshToken");
+          console.log("Token refresh successful, retrying request")
+          await AsyncStorage.removeItem("accessToken")
+          await AsyncStorage.removeItem("refreshToken")
+
+          if (
+            SecureStore &&
+            typeof SecureStore.isAvailableAsync === "function" &&
+            (await SecureStore.isAvailableAsync())
+          ) {
+            await SecureStore.deleteItemAsync("accessToken")
+            await SecureStore.deleteItemAsync("refreshToken")
           }
         }
       } catch (refreshError) {
-        console.error("Error while refreshing token:", refreshError);
+        console.error("Error while refreshing token:", refreshError)
       }
     }
-    
+
     if (error.response) {
-      console.error(`Server responded with status ${error.response.status}`);
-      console.error("Response data:", JSON.stringify(error.response.data, null, 2));
+      console.error(`Server responded with status ${error.response.status}`)
+      console.error("Response data:", JSON.stringify(error.response.data, null, 2))
     } else if (error.request) {
-      console.error("No response received from server");
+      console.error("No response received from server")
     } else {
-      console.error("Error setting up request:", error.message);
+      console.error("Error setting up request:", error.message)
     }
-    
-    return Promise.reject(error);
-  }
-);
 
-export const transactionAPI = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
+    return Promise.reject(error)
   },
+)
+
+export const getWarehouseUrl = () => {
+  let localIp = FALLBACK_IP
+
+  try {
+    if (Constants.expoConfig?.hostUri) {
+      const hostUriParts = Constants.expoConfig.hostUri.split(":")
+      if (hostUriParts.length > 0) {
+        localIp = hostUriParts[0]
+      }
+    }
+  } catch (error) {
+    console.log("Error getting Expo host:", error)
+  }
+  console.log("===== WAREHOUSE CONNECTION INFO =====")
+  console.log("Platform:", Platform.OS)
+  console.log("Physical device:", Device.isDevice)
+  console.log("Local IP:", localIp)
+
+  let baseUrl
+
+  if (Platform.OS === "android") {
+    baseUrl = Device.isDevice
+      ? `http://${localIp}:${API_WAREHOUSE_PORT}${API_PATH}`
+      : `http://10.0.2.2:${API_WAREHOUSE_PORT}${API_PATH}`
+    console.log("Using Android URL:", baseUrl)
+  } else {
+    baseUrl = `http://localhost:${API_WAREHOUSE_PORT}${API_PATH}`
+    console.log("Using default URL:", baseUrl)
+  }
+
+  console.log("Final API URL:", baseUrl)
+  console.log("=============================")
+  return baseUrl
+}
+
+export const warehouseAPI: AxiosInstance = axios.create({
+  baseURL: getWarehouseUrl(),
+  headers: {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+    "Access-Control-Allow-Origin": "*",
+  },
+  timeout: 30000,
 })
 
-export const inventoryAPI = axios.create({
-  baseURL: API_INVENTORY_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
+warehouseAPI.interceptors.request.use(
+  async (config) => {
+    const token = await getToken()
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+      console.log("Using authorization token for warehouse API")
+    }
+    return config
+  },
+  (error) => Promise.reject(error),
+)
 
-export const productAPI = axios.create({
-  baseURL: API_PRODUCT_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
+warehouseAPI.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config
 
-export const supplierAPI = axios.create({
-  baseURL: API_SUPPLIER_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
+    if (
+      (error.response?.status === 403 || error.response?.status === 401) &&
+      !originalRequest._retry
+    ) {
+      console.log("Warehouse API token expired, attempting to refresh")
+      originalRequest._retry = true
 
-export const locationAPI = axios.create({
-  baseURL: API_LOCATION_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
+      try {
+        const newToken = await refreshToken()
+
+        if (newToken) {
+          console.log("Token refresh successful, retrying request")
+          originalRequest.headers.Authorization = `Bearer ${newToken}`
+          return warehouseAPI(originalRequest)
+        } else {
+          console.log("Refresh failed — clearing tokens")
+          await AsyncStorage.removeItem("accessToken")
+          await AsyncStorage.removeItem("refreshToken")
+
+          if (
+            SecureStore &&
+            typeof SecureStore.isAvailableAsync === "function" &&
+            (await SecureStore.isAvailableAsync())
+          ) {
+            await SecureStore.deleteItemAsync("accessToken")
+            await SecureStore.deleteItemAsync("refreshToken")
+          }
+        }
+      } catch (refreshError) {
+        console.error("Warehouse token refresh error:", refreshError)
+      }
+    }
+
+    if (error.response) {
+      console.error(`Server responded with status ${error.response.status}`)
+      console.error("Response data:", JSON.stringify(error.response.data, null, 2))
+    } else if (error.request) {
+      console.error("No response received from server")
+    } else {
+      console.error("Error setting up request:", error.message)
+    }
+
+    return Promise.reject(error)
+  },
+)
